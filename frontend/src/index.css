@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
+
+html,
+body,
+#root,
+.app,
+.content {
+  height: 100%;
+  width: 100%;
+  font-family: 'Roboto', sans-serif;
+}
+
+.app {
+  display: flex;
+  position: relative;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track  {
+  background: #e0e0e0;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on Hover */
+::-webkit-scrollbar-track:hover {
+  background: #555;
+}
+
+/*  Questo codice serve a:
+
+Importare i font Roboto e Source Sans 3 da Google Fonts.
+Impostare uno stile di layout di base per gli elementi html, body, #root, .app, e .content, in modo che occupino l'intera dimensione della finestra e usino il font Roboto.
+Creare una struttura di layout flessibile per .app (utilizzando Flexbox).
+Personalizzare l'aspetto della barra di scorrimento nei browser WebKit (come Chrome e Safari), cambiando larghezza, colore e comportamento in hover. */
+
