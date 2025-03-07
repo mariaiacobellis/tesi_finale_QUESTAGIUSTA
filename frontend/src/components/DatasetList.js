@@ -1,18 +1,82 @@
-import React from 'react';
-import { Grid } from '@mui/material';
-import DatasetCard from './DatasetCard';
-import datasets from '../data'; // Importa i dati dei dataset
+import React, { useState, useRef, useEffect } from "react";
+import { Box, Button, Grid, useTheme } from "@mui/material";
+import DatasetCard from "./DatasetCard";
 
-const DatasetList = () => {
+import { ArrowBack, ArrowForward } from "@mui/icons-material";
+import { tokens } from "../theme";
+
+const DatasetList = ({datasets}) => {
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+    const containerRef = useRef(null);
+    const [maxVisibleCards, setMaxVisibleCards] = useState(1);
+    const [startIndex, setStartIndex] = useState(0);
+
+    // Calcola quante card possono stare in base alla larghezza del container
+    useEffect(() => {
+        const updateVisibleCards = () => {
+            if (containerRef.current) {
+                const containerWidth = containerRef.current.offsetWidth;
+                const cardWidth = 218;
+                const maxCards = Math.floor(containerWidth / cardWidth);
+                setMaxVisibleCards(maxCards > 0 ? maxCards : 1);
+            }
+        };
+
+        updateVisibleCards();
+        window.addEventListener("resize", updateVisibleCards);
+        return () => window.removeEventListener("resize", updateVisibleCards);
+    }, []);
+
+    const nextCards = () => {
+        if (startIndex + maxVisibleCards < datasets.length) {
+            setStartIndex(startIndex + 1);
+        }
+    };
+
+    const prevCards = () => {
+        if (startIndex > 0) {
+            setStartIndex(startIndex - 1);
+        }
+    };
+
     return (
-        <Grid container spacing={3}>
-            {datasets.map((dataset, index) => (
-                <Grid item key={index} xs={12} sm={6} md={4}>
-                    <DatasetCard dataset={dataset} />
+        <Box display="flex" alignItems="center" justifyContent="center" width="100%">
+            {/* Bottone SINISTRA */}
+            <Button onClick={prevCards} disabled={startIndex === 0} sx={{ minWidth: "50px" }}>
+                <ArrowBack sx={{ color: startIndex === 0 ? "gray" : colors.blueAccent[500] }} />
+            </Button>
+
+            {/* Contenitore delle card, allineato al centro */}
+            <Box
+                ref={containerRef}
+                sx={{
+                    flexGrow: 1,
+                    display: "flex",
+                    justifyContent: "center", // Centra le card
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    width: { xs: "90%", sm: "80%", md: "70%" },
+                    maxWidth: "100%",
+                }}
+            >
+                <Grid container spacing={2} sx={{ flexWrap: "nowrap", justifyContent: "center" }}>
+                    {datasets.slice(startIndex, startIndex + maxVisibleCards).map((data, index) => (
+                        <Grid item key={index} sx={{ flex: "1 1 auto", maxWidth: "220px" }}>
+                            <DatasetCard dataset={data} />
+                        </Grid>
+                    ))}
                 </Grid>
-            ))}
-        </Grid>
+            </Box>
+
+            {/* Bottone DESTRA */}
+            <Button onClick={nextCards} disabled={startIndex + maxVisibleCards >= datasets.length} sx={{ minWidth: "50px" }}>
+                <ArrowForward sx={{ color: startIndex + maxVisibleCards >= datasets.length ? "gray" : colors.blueAccent[500] }} />
+            </Button>
+        </Box>
     );
 };
 
 export default DatasetList;
+
+
