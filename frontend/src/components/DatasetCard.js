@@ -7,7 +7,7 @@ const DatasetCard = ({ dataset }) => {
     const colors = tokens(theme.palette.mode);  // Ottieni i colori in base alla modalità (light/dark)
 
     return (
-        <Card sx={{ maxWidth: 345, backgroundColor: colors.primary[500], boxShadow: 3 }}>
+        <Card sx={{ maxWidth: 345, backgroundColor: colors.primary[400], boxShadow: 3 }}>
             <CardMedia
                 component="img"
                 alt={dataset.title}
