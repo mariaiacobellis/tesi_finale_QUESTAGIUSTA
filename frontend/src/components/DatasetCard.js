@@ -1,10 +1,17 @@
 import React from 'react';
 import { Card, CardContent, CardMedia, Typography, Button, useTheme } from '@mui/material';
-import { tokens } from '../theme';  // Importa i token del tema (assicurati che il percorso sia corretto)
+import { tokens } from '../theme';  // Importa i token del tema
+import { useNavigate } from 'react-router-dom';  // Importa useNavigate da React Router
 
 const DatasetCard = ({ dataset }) => {
     const theme = useTheme();  // Ottieni il tema attuale
     const colors = tokens(theme.palette.mode);  // Ottieni i colori in base alla modalità (light/dark)
+    const navigate = useNavigate();  // Hook per la navigazione
+
+    const handleClick = () => {
+        // Naviga alla pagina del singolo dataset usando l'ID
+        navigate(`/dataset/${dataset.id}`);  // Cambia `dataset.id` con il campo che usi per identificare il dataset
+    };
 
     return (
         <Card sx={{ maxWidth: 345, backgroundColor: colors.primary[400], boxShadow: 3 }}>
@@ -27,7 +34,7 @@ const DatasetCard = ({ dataset }) => {
                             backgroundColor: colors.greenAccent[600],
                         }
                     }}
-                    onClick={() => alert(`Cliccato su: ${dataset.title}`)}  // Correzione dell'alert
+                    onClick={handleClick}  // Al click, naviga alla pagina del dataset
                 >
                     Vedi Dettagli
                 </Button>
@@ -37,3 +44,6 @@ const DatasetCard = ({ dataset }) => {
 };
 
 export default DatasetCard;
+
+
+

@@ -2,14 +2,15 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Box, Typography, Card, CardMedia, CardContent, Button, Rating, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, useTheme } from "@mui/material";
 import { tokens } from "../src/theme";
-import data from "../src/data";
+import data from "../src/data";  // Assicurati che il percorso di importazione dei dati sia corretto
 import DownloadIcon from '@mui/icons-material/Download';
 
 const DatasetDetail = () => {
-    const { id } = useParams();
+    const { id } = useParams();  // Ottieni l'ID dai parametri della URL
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const dataset = data.find((d) => d.id === id);
+    const dataset = data.find((d) => d.id === id);  // Trova il dataset con l'ID
+
     const [rating, setRating] = useState(0);
 
     if (!dataset) {
@@ -69,7 +70,6 @@ const DatasetDetail = () => {
                 </CardContent>
             </Card>
 
-
             {/* Tabella dei dati */}
             <TableContainer component={Paper} sx={{ maxWidth: 800, backgroundColor: colors.primary[400] }}>
                 <Table>
@@ -94,5 +94,6 @@ const DatasetDetail = () => {
 };
 
 export default DatasetDetail;
+
 
 
