@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Box, Button, Grid, useTheme } from "@mui/material";
 import DatasetCard from "./DatasetCard";
-
+import { Link } from "react-router-dom";
 import { ArrowBack, ArrowForward } from "@mui/icons-material";
 import { tokens } from "../theme";
 
-const DatasetList = ({datasets}) => {
+const DatasetList = ({ datasets }) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const containerRef = useRef(null);
@@ -61,9 +61,11 @@ const DatasetList = ({datasets}) => {
                 }}
             >
                 <Grid container spacing={2} sx={{ flexWrap: "nowrap", justifyContent: "center" }}>
-                    {datasets.slice(startIndex, startIndex + maxVisibleCards).map((data, index) => (
-                        <Grid item key={index} sx={{ flex: "1 1 auto", maxWidth: "220px" }}>
-                            <DatasetCard dataset={data} />
+                    {datasets.slice(startIndex, startIndex + maxVisibleCards).map((data) => (
+                        <Grid item key={data.id} sx={{ flex: "1 1 auto", maxWidth: "220px" }}>
+                            <Link to={`/datasets/${data.id}`} style={{ textDecoration: "none" }}>
+                                <DatasetCard dataset={data} />
+                            </Link>
                         </Grid>
                     ))}
                 </Grid>
@@ -78,5 +80,6 @@ const DatasetList = ({datasets}) => {
 };
 
 export default DatasetList;
+
 
 

@@ -1,53 +1,32 @@
 const data = [
     {
+        id: 'dataset-1', // ID univoco per il routing
         title: 'Dataset 1',
         description: 'Descrizione del primo dataset.',
-        image: 'https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png', // Sostituisci con una vera immagine
+        image: 'https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png',
         category: 'Musica',
     },
     {
+        id: 'dataset-2',
         title: 'Dataset 2',
-        description: 'Descrizione del primo dataset.',
-        image: 'https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png', // Sostituisci con una vera immagine
-        category: 'Musica',
-    },
-    {
-        title: 'Dataset 3',
-        description: 'Descrizione del primo dataset.',
-        image: 'https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png', // Sostituisci con una vera immagine
-        category: 'Beauty',
-    },
-    {
-        title: 'Dataset 4',
-        description: 'Descrizione del primo dataset.',
-        image: 'https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png', // Sostituisci con una vera immagine
-        category: 'Beauty',
-    },
-    {
-        title: 'Dataset 5',
-        description: 'Descrizione del primo dataset.',
-        image: 'https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png', // Sostituisci con una vera immagine
-        category: 'Sport',
-    },
-    {
-        title: 'Dataset 6',
-        description: 'Descrizione del primo dataset.',
-        image: 'https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png', // Sostituisci con una vera immagine
-        category: 'Sport',
-    },
-    {
-        title: 'Dataset 7',
         description: 'Descrizione del secondo dataset.',
         image: 'https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png',
-        category: 'Sport',
+        category: 'Musica',
     },
     {
-        title: 'Dataset 8',
+        id: 'dataset-3',
+        title: 'Dataset 3',
         description: 'Descrizione del terzo dataset.',
+        image: 'https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png',
+        category: 'Beauty',
+    },
+    {
+        id: 'dataset-4',
+        title: 'Dataset 4',
+        description: 'Descrizione del quarto dataset.',
         image: 'https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png',
         category: 'Sport',
     },
-    // Aggiungi altri dataset qui
 ];
 
 export default data;

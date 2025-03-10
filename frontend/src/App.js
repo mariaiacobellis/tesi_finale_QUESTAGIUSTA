@@ -8,30 +8,32 @@ import { ColorModeContext, useMode } from "./theme";
 import LoginPage from "./scenes/login/LoginPage";
 import FAQPage from "./scenes/faq/FaqPage";
 import RegisterPage from "./scenes/login/RegisterPage";
-import Datasets from './scenes/datasets/Datasets';  // Verifica che il percorso sia corretto
-import Discussion from './scenes/discussion/Discussion'; // Verifica anche questo
-import Add from './scenes/adddataset/Add'; // Assicurati che il percorso sia giusto
+import Datasets from './scenes/datasets/Datasets';
+import DatasetDetail from './DatasetDetail';  // Importata la pagina del singolo dataset
+import Discussion from './scenes/discussion/Discussion';
+import Add from './scenes/adddataset/Add';
 
 function App() {
-  const [theme, colorMode] = useMode();  // Ottieni il tema e la modalità di colore
-  const [isSidebar, setIsSidebar] = useState(true);  // Stato per la visibilità della Sidebar
+  const [theme, colorMode] = useMode();
+  const [isSidebar, setIsSidebar] = useState(true);
 
   return (
       <ColorModeContext.Provider value={colorMode}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <div className="app">
-            <Sidebar isSidebar={isSidebar} />  {/* Sidebar che riceve la visibilità come prop */}
+            <Sidebar isSidebar={isSidebar} />
             <main className="content">
-              <Topbar setIsSidebar={setIsSidebar} />  {/* Topbar che aggiorna la visibilità della sidebar */}
+              <Topbar setIsSidebar={setIsSidebar} />
               <Routes>
-                <Route path="/" element={<Homepage />} />  {/* Pagina principale */}
-                <Route path="/login" element={<LoginPage />} />  {/* Pagina di Login */}
-                <Route path="/faq" element={<FAQPage />} />  {/* Pagina FAQ */}
-                <Route path="/register" element={<RegisterPage />} />  {/* Pagina di Registrazione */}
-                <Route path="/datasets" element={<Datasets />} />  {/* Pagina Datasets */}
-                <Route path="/discussion" element={<Discussion />} />  {/* Pagina Discussione */}
-                <Route path="/adddatasets" element={<Add />} />  {/* Pagina per aggiungere dataset */}
+                <Route path="/" element={<Homepage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/faq" element={<FAQPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/datasets" element={<Datasets />} />
+                <Route path="/datasets/:id" element={<DatasetDetail />} />  {/* Pagina dinamica del dataset */}
+                <Route path="/discussion" element={<Discussion />} />
+                <Route path="/adddatasets" element={<Add />} />
               </Routes>
             </main>
           </div>
@@ -41,6 +43,7 @@ function App() {
 }
 
 export default App;
+
 
 
 
