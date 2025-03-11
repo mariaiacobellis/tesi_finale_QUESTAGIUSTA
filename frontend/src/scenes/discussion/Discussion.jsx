@@ -4,6 +4,7 @@ import { useTheme } from '@mui/material/styles';
 import { tokens } from '../../theme';
 import Header from '../../components/Header';
 import { ExpandMore as ExpandMoreIcon, Comment as CommentIcon } from '@mui/icons-material';
+import { useLocation } from "react-router-dom";
 
 const discussions = [
     {
@@ -29,6 +30,11 @@ const DiscussionPage = () => {
     const colors = tokens(theme.palette.mode);
     const [openIndex, setOpenIndex] = useState(null);
 
+    // Recupera i parametri dall'URL
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const datasetTitle = queryParams.get("datasetTitle");  // Ottieni il nome del dataset
+
     const handleToggle = (index) => {
         setOpenIndex(openIndex === index ? null : index);
     };
@@ -36,6 +42,19 @@ const DiscussionPage = () => {
     return (
         <Container maxWidth="md" sx={{ mt: 4, pb: 4 }}>
             <Header title="Discussioni" subtitle="Partecipa alle discussioni e lascia i tuoi commenti" />
+
+            {/* Sezione dedicata ai commenti per un dataset specifico */}
+            {datasetTitle && (
+                <Box mb={4} p={2} sx={{ backgroundColor: colors.primary[300], borderRadius: 2 }}>
+                    <Typography variant="h6" fontWeight="bold">
+                        Commenti per: {datasetTitle}
+                    </Typography>
+                    <Typography variant="body2" color={colors.grey[600]}>
+                        Qui puoi votare e commentare il dataset "{datasetTitle}".
+                    </Typography>
+                </Box>
+            )}
+
             <Box display="flex" flexDirection="column" gap={2}>
                 {discussions.map((discussion, index) => (
                     <Card
@@ -104,3 +123,5 @@ const DiscussionPage = () => {
 };
 
 export default DiscussionPage;
+
+

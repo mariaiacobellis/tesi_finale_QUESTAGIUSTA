@@ -8,6 +8,8 @@ import {
 import { tokens } from "../src/theme";
 import DownloadIcon from '@mui/icons-material/Download';
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 
 const DatasetDetail = () => {
     const { id } = useParams();
@@ -15,6 +17,7 @@ const DatasetDetail = () => {
     const colors = tokens(theme.palette.mode);
     const [dataset, setDataset] = useState(null);
     const [rating, setRating] = useState(0);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchDataset = async () => {
@@ -145,6 +148,14 @@ const DatasetDetail = () => {
                             precision={0.5}
                         />
                     </Box>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => navigate(`/discussion?datasetId=${id}&datasetTitle=${encodeURIComponent(dataset?.title)}`)}
+                        sx={{ mt: 2 }}
+                    >
+                        Vota e commenta dataset
+                    </Button>
                 </CardContent>
             </Card>
 
