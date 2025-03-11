@@ -24,7 +24,7 @@ router.post("/add", async (req, res) => {
     const {
         author, editor, title, booktitle, pages, series, volume, publisher,
         year, number, location, address, keywords, url, doi, timestamp,
-        biburl, bibsource, journal, valutazione, storage, category, img
+        biburl, bibsource, journal, rating, storage, category, img
     } = req.body;
 
     // Converte undefined → NULL per sicurezza

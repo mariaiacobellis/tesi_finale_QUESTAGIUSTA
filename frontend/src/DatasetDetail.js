@@ -185,7 +185,7 @@ const DatasetDetail = () => {
                         <Typography variant="body1" color={colors.grey[100]} mr={1}>
                             Valutazione:
                         </Typography>
-                        {dataset?.rating !== undefined ? (
+                        {dataset?.rating!== undefined ? (
                             <Rating
                                 value={dataset.rating} // Usa il valore del rating che è già stato impostato
                                 readOnly // Disabilita la modifica

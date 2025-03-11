@@ -89,7 +89,7 @@ db.connect((err) => {
                     biburl TEXT,
                     bibsource TEXT,
                     journal TEXT,
-                    valutazione FLOAT,
+                    rating FLOAT,
                     storage VARCHAR(255) NOT NULL UNIQUE,
                     category TEXT NOT NULL,
                     img TEXT
