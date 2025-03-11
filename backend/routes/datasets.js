@@ -48,7 +48,7 @@ router.post("/add", async (req, res) => {
         biburl || null,
         bibsource || null,
         journal || null,
-        valutazione || null,
+        rating || null,
         storage,
         category,
         img
@@ -57,7 +57,7 @@ router.post("/add", async (req, res) => {
     const sql = `
         INSERT INTO datasets (
             author, editor, title, booktitle, pages, series, volume, publisher, year,
-            number, location, address, keywords, url, doi, timestamp, biburl, bibsource, journal, valutazione, storage, category, img
+            number, location, address, keywords, url, doi, timestamp, biburl, bibsource, journal, rating, storage, category, img
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 

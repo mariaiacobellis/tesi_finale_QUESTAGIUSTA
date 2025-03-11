@@ -46,7 +46,7 @@ const Add = () => {
             journal: "{ACM} Trans. Interact. Intell. Syst.",
             rating: 4.5, // La valutazione in stelle (float)
             storage: "movielens1m.tsv",
-            category: "film",
+            category: "Film",
             img: 'https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png'
         };
 

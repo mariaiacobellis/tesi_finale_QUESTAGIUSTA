@@ -64,6 +64,7 @@ const DatasetDetail = () => {
 
                 if (response.data.datasets) {
                     setDataset(response.data.datasets);
+                    console.log(dataset);
                 } else {
                     console.error("Nessun dataset trovato nella risposta!");
                 }
@@ -83,6 +84,8 @@ const DatasetDetail = () => {
     if (!dataset) {
         return <Typography variant="h4" color="error">Dataset non trovato</Typography>;
     }
+
+
 
     return (
         <Box display="flex" flexDirection="column" alignItems="center" p={3}>
@@ -178,17 +181,17 @@ const DatasetDetail = () => {
                         )}
                     </Grid>
 
-                    {/* Sezione di valutazione */}
                     <Box mt={2} display="flex" alignItems="center">
                         <Typography variant="body1" color={colors.grey[100]} mr={1}>
                             Valutazione:
                         </Typography>
                         <Rating
-                            value={rating}
-                            onChange={(event, newValue) => setRating(newValue)}
-                            precision={0.5}
+                            value={dataset?.rating} // Usa il valore del rating che è già stato impostato
+                            readOnly // Disabilita la modifica
+                            precision={0.5} // Imposta la precisione a 0.5 stelle
                         />
                     </Box>
+
                     <Button
                         variant="contained"
                         color="primary"
