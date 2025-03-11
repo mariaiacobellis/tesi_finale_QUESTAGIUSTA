@@ -185,12 +185,28 @@ const DatasetDetail = () => {
                         <Typography variant="body1" color={colors.grey[100]} mr={1}>
                             Valutazione:
                         </Typography>
-                        <Rating
-                            value={dataset?.rating} // Usa il valore del rating che è già stato impostato
-                            readOnly // Disabilita la modifica
-                            precision={0.5} // Imposta la precisione a 0.5 stelle
-                        />
+                        {dataset?.rating !== undefined ? (
+                            <Rating
+                                value={dataset.rating} // Usa il valore del rating che è già stato impostato
+                                readOnly // Disabilita la modifica
+                                precision={0.5} // Imposta la precisione a 0.5 stelle
+                                sx={{
+                                    '& .MuiRating-iconFilled': {
+                                        color: 'gold', // Colora le stelle piene di giallo
+                                    },
+                                    '& .MuiRating-iconEmpty': {
+                                        color: colors.grey[500], // Colora le stelle vuote di grigio per visibilità
+                                    },
+                                }}
+                            />
+                        ) : (
+                            <Typography variant="body1" color={colors.grey[100]}>
+                                Nessuna valutazione disponibile
+                            </Typography>
+                        )}
                     </Box>
+
+
 
                     <Button
                         variant="contained"
