@@ -33,6 +33,7 @@ function App() {
                 <Route path="/datasets" element={<Datasets />} />
                 <Route path="/datasets/:id" element={<DatasetDetail />} />  {/* Pagina dinamica del dataset */}
                 <Route path="/discussion" element={<Discussion />} />
+                <Route path="/discussion/:id" element={<Discussion />} />
                 <Route path="/adddatasets" element={<Add />} />
               </Routes>
             </main>

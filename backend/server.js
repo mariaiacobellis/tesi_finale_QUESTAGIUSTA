@@ -2,19 +2,17 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import mysql from "mysql2";
-import cors from "cors"; //sistema di sicurezza
+import cors from "cors"; // sistema di sicurezza
 
-import auth from "./routes/auth.js"
-import datasets from "./routes/datasets.js"; //cripta la password nel database
+import auth from "./routes/auth.js";
+import datasets from "./routes/datasets.js";
+import comments from "./routes/comments.js"; // Importa il router dei commenti
 
-//Da tenere sempre sopra tutto
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-
-
-// Connessione temporanea senza DB per crearlo
+// Connessione al database
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -22,7 +20,7 @@ const db = mysql.createConnection({
     database: process.env.DB_NAME,
 });
 
-// Connetti a MySQL
+// Connessione al database
 db.connect((err) => {
     if (err) {
         console.error("Errore di connessione a MySQL:", err);
@@ -53,17 +51,14 @@ db.connect((err) => {
             }
             console.log("Connesso al database:", process.env.DB_NAME);
 
-            // Crea la tabella utenti se non esiste
+            // Creazione delle tabelle
             const createUsersTable = `
-        CREATE TABLE IF NOT EXISTS users (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          username VARCHAR(255) NOT NULL UNIQUE,
-          password VARCHAR(255) NOT NULL
-        )
-      `;
-
-
-
+                CREATE TABLE IF NOT EXISTS users (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    username VARCHAR(255) NOT NULL UNIQUE,
+                    password VARCHAR(255) NOT NULL
+                )
+            `;
             dbWithDB.query(createUsersTable, (err, result) => {
                 if (err) {
                     console.error("Errore nella creazione della tabella utenti:", err);
@@ -73,30 +68,33 @@ db.connect((err) => {
             });
 
             const createDatasetsTable = `
-    CREATE TABLE IF NOT EXISTS datasets ( 
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        author TEXT,
-        editor TEXT,
-        title TEXT NOT NULL,
-        booktitle TEXT,
-        pages TEXT,
-        series TEXT,
-        volume TEXT,
-        publisher TEXT,
-        year TEXT,
-        number TEXT,
-        location TEXT,
-        address TEXT,
-        keywords TEXT,
-        url TEXT,
-        doi TEXT,
-        timestamp TEXT,
-        biburl TEXT,
-        bibsource TEXT,
-        journal TEXT,
-        valutazione FLOAT,
-        storage VARCHAR(255) NOT NULL UNIQUE )  `;
-
+                CREATE TABLE IF NOT EXISTS datasets ( 
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    author TEXT,
+                    editor TEXT,
+                    title TEXT NOT NULL,
+                    booktitle TEXT,
+                    pages TEXT,
+                    series TEXT,
+                    volume TEXT,
+                    publisher TEXT,
+                    year TEXT,
+                    number TEXT,
+                    location TEXT,
+                    address TEXT,
+                    keywords TEXT,
+                    url TEXT,
+                    doi TEXT,
+                    timestamp TEXT,
+                    biburl TEXT,
+                    bibsource TEXT,
+                    journal TEXT,
+                    valutazione FLOAT,
+                    storage VARCHAR(255) NOT NULL UNIQUE,
+                    category TEXT NOT NULL,
+                    img TEXT
+                )
+            `;
             dbWithDB.query(createDatasetsTable, (err, result) => {
                 if (err) {
                     console.error("Errore nella creazione della tabella dataset:", err);
@@ -105,29 +103,36 @@ db.connect((err) => {
                 console.log("Tabella 'dataset' pronta!");
             });
 
-
-
-
-
-
-
-
-
-
-
-
-        }); //chiusura connessione
-
+            // Creazione della tabella commenti
+            const createCommentsTable = `
+                CREATE TABLE IF NOT EXISTS comments (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    discussion_id INT NOT NULL,
+                    username VARCHAR(255) NOT NULL,
+                    comment TEXT NOT NULL,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (discussion_id) REFERENCES datasets(id) ON DELETE CASCADE
+                );
+            `;
+            dbWithDB.query(createCommentsTable, (err, result) => {
+                if (err) {
+                    console.error("Errore nella creazione della tabella commenti:", err);
+                    return;
+                }
+                console.log("Tabella 'comments' pronta!");
+            });
+        });
     });
 });
 
-
-
-
-app.use((req,res,next)=>{
-    req.db = db
-    next()
+// Iniettiamo la connessione al db nelle richieste
+app.use((req, res, next) => {
+    req.db = db;
+    next();
 });
-app.use("/auth", auth)
-app.use("/datasets", datasets)
+
+app.use("/auth", auth);
+app.use("/datasets", datasets);
+app.use("/comments", comments); // Aggiungi il router dei commenti
+
 app.listen(5000, () => console.log("Server avviato su http://localhost:5000"));

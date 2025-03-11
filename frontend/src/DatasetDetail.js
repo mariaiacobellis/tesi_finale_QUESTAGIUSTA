@@ -8,6 +8,7 @@ import {
 import { tokens } from "../src/theme";
 import DownloadIcon from '@mui/icons-material/Download';
 import axios from "axios";
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { useNavigate } from "react-router-dom";
 
 
@@ -18,6 +19,41 @@ const DatasetDetail = () => {
     const [dataset, setDataset] = useState(null);
     const [rating, setRating] = useState(0);
     const navigate = useNavigate();
+    const [data, setData] = useState([]);
+    const [hasMore, setHasMore] = useState(true);
+    const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(false);
+    const [rows, setRows] = useState([]);
+    const [columns, setColumns] = useState([]);
+
+
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`http://localhost:5000/datasets/getFile/${dataset.storage}`, {
+                params: { page, limit: 20 }, // Limit di 20 per pagina, puoi regolarlo
+            });
+
+            if (response.data.length === 0) {
+                setHasMore(false); // Se non ci sono più dati, non continuare il caricamento
+            } else {
+                setRows((prevRows) => [...prevRows, ...response.data]);
+
+                // Imposta dinamicamente le colonne usando i nomi della prima riga dei dati
+                const dynamicColumns = Object.keys(response.data[0]).map(key => ({
+                    id: key,
+                    label: key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '), // Formatta il nome della colonna
+                }));
+                setColumns(dynamicColumns);
+
+                setPage(page + 1);
+            }
+        } catch (error) {
+            console.error('Errore nel caricamento dei dati della tabella:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         const fetchDataset = async () => {
@@ -37,6 +73,11 @@ const DatasetDetail = () => {
         };
 
         fetchDataset();
+
+        if (dataset){
+            fetchData();
+        }
+
     }, [id]);
 
     if (!dataset) {
@@ -49,7 +90,7 @@ const DatasetDetail = () => {
                 <CardMedia
                     component="img"
                     height="300"
-                    image={dataset?.image || "default-image.jpg"}
+                    image={dataset?.img || "default-image.jpg"}
                     alt={dataset?.title || "Dataset"}
                 />
                 <CardContent>
@@ -151,7 +192,7 @@ const DatasetDetail = () => {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={() => navigate(`/discussion?datasetId=${id}&datasetTitle=${encodeURIComponent(dataset?.title)}`)}
+                        onClick={() => navigate(`/discussion/${id}`)}
                         sx={{ mt: 2 }}
                     >
                         Vota e commenta dataset
@@ -159,29 +200,40 @@ const DatasetDetail = () => {
                 </CardContent>
             </Card>
 
-            {/* Tabella dei dati */}
+            {/* Tabella con infinite scroll */}
             <TableContainer component={Paper} sx={{ maxWidth: 800, backgroundColor: colors.primary[400] }}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell sx={{ color: colors.grey[100] }}>Nome</TableCell>
-                            <TableCell sx={{ color: colors.grey[100] }}>Punteggio</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {[
-                            { nome: "Damiano David", punteggio: 85 },
-                            { nome: "Harry Styles", punteggio: 78 },
-                            { nome: "Olly", punteggio: 92 },
-                            { nome: "The Kolors", punteggio: 65 },
-                        ].map((row, index) => (
-                            <TableRow key={index}>
-                                <TableCell sx={{ color: colors.grey[100] }}>{row.nome}</TableCell>
-                                <TableCell sx={{ color: colors.grey[100] }}>{row.punteggio}</TableCell>
+                <InfiniteScroll
+                    dataLength={rows.length} // La lunghezza attuale dei dati
+                    next={fetchData} // Funzione di caricamento dei dati
+                    hasMore={hasMore} // Controlla se ci sono ancora dati da caricare
+                    loader={<h4>Caricamento...</h4>}
+                    endMessage={<p>Fine dei dati</p>}
+                >
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                {/* Genera dinamicamente le intestazioni delle colonne */}
+                                {columns.map((col) => (
+                                    <TableCell key={col.id} sx={{ color: colors.grey[100] }}>
+                                        {col.label}
+                                    </TableCell>
+                                ))}
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                        </TableHead>
+                        <TableBody>
+                            {rows.map((row, index) => (
+                                <TableRow key={index}>
+                                    {/* Genera dinamicamente le righe della tabella */}
+                                    {columns.map((col) => (
+                                        <TableCell key={col.id} sx={{ color: colors.grey[100] }}>
+                                            {row[col.id]}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </InfiniteScroll>
             </TableContainer>
         </Box>
     );

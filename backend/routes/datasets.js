@@ -1,5 +1,20 @@
 import express from "express";
+import * as path from "node:path";
+import * as fs from "node:fs";
+import {fileURLToPath} from "url";
 const router = express.Router();
+
+
+
+const readTSVFile = (nomeFile) => {
+    console.log(nomeFile);
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const filePath = path.join(__dirname, "/fileDataset",nomeFile);
+    const fileContent = fs.readFileSync(filePath, 'utf-8');
+    const rows = fileContent.split('\n').map(row => row.split('\t'));
+    return rows;
+};
 
 // Registrazione utente
 router.post("/add", async (req, res) => {
@@ -9,7 +24,7 @@ router.post("/add", async (req, res) => {
     const {
         author, editor, title, booktitle, pages, series, volume, publisher,
         year, number, location, address, keywords, url, doi, timestamp,
-        biburl, bibsource, journal, valutazione, storage
+        biburl, bibsource, journal, valutazione, storage, category, img
     } = req.body;
 
     // Converte undefined → NULL per sicurezza
@@ -34,14 +49,16 @@ router.post("/add", async (req, res) => {
         bibsource || null,
         journal || null,
         valutazione || null,
-        storage
+        storage,
+        category,
+        img
     ];
 
     const sql = `
         INSERT INTO datasets (
             author, editor, title, booktitle, pages, series, volume, publisher, year,
-            number, location, address, keywords, url, doi, timestamp, biburl, bibsource, journal, valutazione, storage
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            number, location, address, keywords, url, doi, timestamp, biburl, bibsource, journal, valutazione, storage, category, img
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     db.query(sql, publicationData, (err, result) => {
@@ -83,5 +100,20 @@ router.get("/all", (req, res) => {
         res.json({ datasets: results });
     });
 });
+
+router.get("/getFile/:id", (req, res) =>{
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+
+    console.log(req.params.id);
+
+    const data = readTSVFile(req.params.id);
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+
+    const paginatedData = data.slice(startIndex, endIndex);
+
+    res.json(paginatedData);
+} );
 
 export default router;

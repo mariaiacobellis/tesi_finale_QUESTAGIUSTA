@@ -3,6 +3,7 @@ import { Container, Box, Card, CardContent, Typography, TextField, Button } from
 import { useTheme } from '@mui/material/styles';
 import { tokens } from '../../theme';
 import Header from '../../components/Header';
+import axios from "axios";
 
 const Add = () => {
     const theme = useTheme();
@@ -22,15 +23,42 @@ const Add = () => {
         });
     };
 
-    const handleSubmit = () => {
-        // Logica per aggiungere il dataset (potrebbe essere un POST a un server, o salvare i dati localmente)
-        alert("Nuovo dataset aggiunto!");
-        // Puoi anche aggiungere una logica per resettare il form
-        setDataset({
-            title: '',
-            description: '',
-            imageUrl: ''
-        });
+    const handleSubmit = async () => {
+        const publicationData = {
+            author: "F. Maxwell Harper and Joseph A. Konstan",
+            editor: "",
+            title: "The MovieLens Datasets: History and Context",
+            booktitle: null,
+            pages: "19:1--19:19",
+            series: null,
+            volume: "5",
+            publisher: null,
+            year: "2016",
+            number: "4",
+            location: null,
+            address: null,
+            keywords: null,
+            url: "https://doi.org/10.1145/2827872",
+            doi: "10.1145/2827872",
+            timestamp: "Mon, 15 Jun 2020 16:49:42 +0200",
+            biburl: "https://dblp.org/rec/journals/tiis/HarperK16.bib",
+            bibsource: "dblp computer science bibliography, https://dblp.org",
+            journal: "{ACM} Trans. Interact. Intell. Syst.",
+            rating: 4.5, // La valutazione in stelle (float)
+            storage: "movielens1m.tsv",
+            category: "film",
+            img: 'https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png'
+        };
+
+
+        try {
+            const response = await axios.post("http://localhost:5000/datasets/add", publicationData)
+
+            console.log(response);
+        } catch {
+
+        }
+
     };
 
     return (
