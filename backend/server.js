@@ -4,7 +4,8 @@ import express from "express";
 import mysql from "mysql2";
 import cors from "cors"; //sistema di sicurezza
 
-import auth from "./routes/auth.js" //cripta la password nel database
+import auth from "./routes/auth.js"
+import datasets from "./routes/datasets.js"; //cripta la password nel database
 
 //Da tenere sempre sopra tutto
 const app = express();
@@ -61,6 +62,8 @@ db.connect((err) => {
         )
       `;
 
+
+
             dbWithDB.query(createUsersTable, (err, result) => {
                 if (err) {
                     console.error("Errore nella creazione della tabella utenti:", err);
@@ -68,7 +71,53 @@ db.connect((err) => {
                 }
                 console.log("Tabella 'users' pronta!");
             });
-        });
+
+            const createDatasetsTable = `
+    CREATE TABLE IF NOT EXISTS datasets ( 
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        author TEXT,
+        editor TEXT,
+        title TEXT NOT NULL,
+        booktitle TEXT,
+        pages TEXT,
+        series TEXT,
+        volume TEXT,
+        publisher TEXT,
+        year TEXT,
+        number TEXT,
+        location TEXT,
+        address TEXT,
+        keywords TEXT,
+        url TEXT,
+        doi TEXT,
+        timestamp TEXT,
+        biburl TEXT,
+        bibsource TEXT,
+        journal TEXT,
+        valutazione FLOAT,
+        storage VARCHAR(255) NOT NULL UNIQUE )  `;
+
+            dbWithDB.query(createDatasetsTable, (err, result) => {
+                if (err) {
+                    console.error("Errore nella creazione della tabella dataset:", err);
+                    return;
+                }
+                console.log("Tabella 'dataset' pronta!");
+            });
+
+
+
+
+
+
+
+
+
+
+
+
+        }); //chiusura connessione
+
     });
 });
 
@@ -80,4 +129,5 @@ app.use((req,res,next)=>{
     next()
 });
 app.use("/auth", auth)
+app.use("/datasets", datasets)
 app.listen(5000, () => console.log("Server avviato su http://localhost:5000"));

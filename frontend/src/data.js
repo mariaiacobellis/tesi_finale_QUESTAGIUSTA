@@ -1,6 +1,6 @@
 const data = [
     {
-        id: 'dataset-1', // ID univoco per il routing
+        id: '1', // ID univoco per il routing
         title: 'Dataset 1',
         description: 'Descrizione del primo dataset.',
         image: 'https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png',
