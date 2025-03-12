@@ -10,6 +10,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import axios from "axios";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useNavigate } from "react-router-dom";
+import {object} from "yup";
 
 
 const DatasetDetail = () => {
@@ -39,12 +40,15 @@ const DatasetDetail = () => {
             } else {
                 setRows((prevRows) => [...prevRows, ...response.data]);
 
+                console.log(response.data[0]);
                 // Imposta dinamicamente le colonne usando i nomi della prima riga dei dati
                 const dynamicColumns = Object.keys(response.data[0]).map(key => ({
                     id: key,
-                    label: key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '), // Formatta il nome della colonna
+                    label: response.data[0][key] // Formatta il nome della colonna
+
                 }));
                 setColumns(dynamicColumns);
+
 
                 setPage(page + 1);
             }
@@ -109,48 +113,18 @@ const DatasetDetail = () => {
 
                     {/* Griglia con tutti i campi */}
                     <Grid container spacing={2} mt={2}>
-                        {[
-                            { key: "author", label: "Autore" },
-                            { key: "editor", label: "Editor" },
-                            { key: "booktitle", label: "Titolo del Libro" },
-                            { key: "pages", label: "Pagine" },
-                            { key: "series", label: "Serie" },
-                            { key: "volume", label: "Volume" },
-                            { key: "publisher", label: "Editore" },
-                            { key: "year", label: "Anno" },
-                            { key: "number", label: "Numero" },
-                            { key: "location", label: "Luogo" },
-                            { key: "address", label: "Indirizzo" },
-                            { key: "biburl", label: "BibURL" },
-                            { key: "bibsource", label: "Fonte Bibliografica" },
-                            { key: "journal", label: "Giornale" },
-                            { key: "timestamp", label: "Timestamp" },
-                            { key: "valutazione", label: "Valutazione" },
-                        ].map(({ key, label }) =>
-                            dataset?.[key] ? (
+                        {Object.entries(dataset || {})
+                            .filter(([key, value]) =>
+                                value &&
+                                !["keywords", "storage", "category", "img", "rating", "id", "numRatings", "numUsers", "numItems", "density"].includes(key)
+                            )
+                            .map(([key, value]) => (
                                 <Grid item xs={12} sm={6} key={key}>
                                     <Typography variant="body1" color={colors.grey[100]}>
-                                        <strong>{label}:</strong> {dataset[key]}
+                                        <strong>{key.charAt(0).toUpperCase() + key.slice(1)}:</strong> {value}
                                     </Typography>
                                 </Grid>
-                            ) : null
-                        )}
-
-                        {/* Keywords con i Chip */}
-                        {dataset?.keywords && (
-                            <Grid item xs={12}>
-                                <Typography variant="body2" color={colors.grey[100]} gutterBottom>
-                                    🔑 Parole chiave:
-                                </Typography>
-                                <Grid container spacing={1}>
-                                    {dataset.keywords.split(",").map((keyword, index) => (
-                                        <Grid item key={index}>
-                                            <Chip label={keyword.trim()} color="primary" />
-                                        </Grid>
-                                    ))}
-                                </Grid>
-                            </Grid>
-                        )}
+                            ))}
 
                         {/* Link URL */}
                         {dataset?.url && (
@@ -231,12 +205,11 @@ const DatasetDetail = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                {/* Genera dinamicamente le intestazioni delle colonne */}
-                                {columns.map((col) => (
-                                    <TableCell key={col.id} sx={{ color: colors.grey[100] }}>
-                                        {col.label}
-                                    </TableCell>
-                                ))}
+                                {/* Righe con le informazioni aggiuntive */}
+                                <TableCell sx={{ color: colors.grey[100] }}><strong>N. ratings:</strong> {dataset?.numRatings || "Dati non disponibili"}</TableCell>
+                                <TableCell sx={{ color: colors.grey[100] }}><strong>N. utenti:</strong> {dataset?.numUsers || "Dati non disponibili"}</TableCell>
+                                <TableCell sx={{ color: colors.grey[100] }}><strong>N. item:</strong> {dataset?.numItems || "Dati non disponibili"}</TableCell>
+                                <TableCell sx={{ color: colors.grey[100] }}><strong>Density:</strong> {dataset?.density || "Dati non disponibili"}</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>

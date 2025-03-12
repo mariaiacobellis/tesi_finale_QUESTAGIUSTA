@@ -47,7 +47,11 @@ const Add = () => {
             rating: 4.5, // La valutazione in stelle (float)
             storage: "movielens1m.tsv",
             category: "Film",
-            img: 'https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png'
+            img: 'https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png',
+            numRatings: 1000209, // Esempio di numero di valutazioni
+            numUsers: 6040,    // Esempio di numero di utenti
+            numItems: 3706,    // Esempio di numero di item
+            density: 0.044683625622312845     // Esempio di densità
         };
 
 

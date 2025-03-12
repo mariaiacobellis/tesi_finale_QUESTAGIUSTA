@@ -6,7 +6,7 @@ import cors from "cors"; // sistema di sicurezza
 
 import auth from "./routes/auth.js";
 import datasets from "./routes/datasets.js";
-import comments from "./routes/comments.js"; // Importa il router dei commenti
+
 
 const app = express();
 app.use(express.json());
@@ -92,7 +92,11 @@ db.connect((err) => {
                     rating FLOAT,
                     storage VARCHAR(255) NOT NULL UNIQUE,
                     category TEXT NOT NULL,
-                    img TEXT
+                    img TEXT,
+                    numRatings FLOAT ,  -- Numero di valutazioni
+                    numUsers FLOAT,    -- Numero di utenti
+                    numItems FLOAT ,    -- Numero di item
+                    density FLOAT  -- Densità del dataset
                 )
             `;
             dbWithDB.query(createDatasetsTable, (err, result) => {
@@ -103,7 +107,7 @@ db.connect((err) => {
                 console.log("Tabella 'dataset' pronta!");
             });
 
-            // Creazione della tabella commenti
+            {/*Creazione della tabella commenti
             const createCommentsTable = `
                 CREATE TABLE IF NOT EXISTS comments (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -120,7 +124,7 @@ db.connect((err) => {
                     return;
                 }
                 console.log("Tabella 'comments' pronta!");
-            });
+            });*/}
         });
     });
 });
@@ -133,6 +137,6 @@ app.use((req, res, next) => {
 
 app.use("/auth", auth);
 app.use("/datasets", datasets);
-app.use("/comments", comments); // Aggiungi il router dei commenti
+//app.use("/comments", comments); // Aggiungi il router dei commenti
 
 app.listen(5000, () => console.log("Server avviato su http://localhost:5000"));
