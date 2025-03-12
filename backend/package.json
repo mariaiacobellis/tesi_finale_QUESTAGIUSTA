@@ -5,6 +5,7 @@
   "scripts": {
     "start_server": "nodemon server.js"
   },
+  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
