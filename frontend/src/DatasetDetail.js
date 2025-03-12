@@ -206,9 +206,9 @@ const DatasetDetail = () => {
                         <TableHead>
                             <TableRow>
                                 {/* Righe con le informazioni aggiuntive */}
-                                <TableCell sx={{ color: colors.grey[100] }}><strong>N. ratings:</strong> {dataset?.numRatings || "Dati non disponibili"}</TableCell>
                                 <TableCell sx={{ color: colors.grey[100] }}><strong>N. utenti:</strong> {dataset?.numUsers || "Dati non disponibili"}</TableCell>
                                 <TableCell sx={{ color: colors.grey[100] }}><strong>N. item:</strong> {dataset?.numItems || "Dati non disponibili"}</TableCell>
+                                <TableCell sx={{ color: colors.grey[100] }}><strong>N. ratings:</strong> {dataset?.numRatings || "Dati non disponibili"}</TableCell>
                                 <TableCell sx={{ color: colors.grey[100] }}><strong>Density:</strong> {dataset?.density || "Dati non disponibili"}</TableCell>
                             </TableRow>
                         </TableHead>
