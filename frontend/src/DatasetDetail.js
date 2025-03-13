@@ -3,15 +3,15 @@ import { useParams } from "react-router-dom";
 import {
     Box, Typography, Card, CardMedia, CardContent, Button, Rating,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
-    Grid, Chip, useTheme
+    Grid, useTheme
 } from "@mui/material";
 import { tokens } from "../src/theme";
 import DownloadIcon from '@mui/icons-material/Download';
 import axios from "axios";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useNavigate } from "react-router-dom";
-import {object} from "yup";
-
+import { Bar } from "react-chartjs-2";
+import { Chart as ChartJS } from "chart.js/auto";
 
 const DatasetDetail = () => {
     const { id } = useParams();
@@ -26,7 +26,6 @@ const DatasetDetail = () => {
     const [loading, setLoading] = useState(false);
     const [rows, setRows] = useState([]);
     const [columns, setColumns] = useState([]);
-
 
     const fetchData = async () => {
         setLoading(true);
@@ -45,10 +44,8 @@ const DatasetDetail = () => {
                 const dynamicColumns = Object.keys(response.data[0]).map(key => ({
                     id: key,
                     label: response.data[0][key] // Formatta il nome della colonna
-
                 }));
                 setColumns(dynamicColumns);
-
 
                 setPage(page + 1);
             }
@@ -79,7 +76,7 @@ const DatasetDetail = () => {
 
         fetchDataset();
 
-        if (dataset){
+        if (dataset) {
             fetchData();
         }
 
@@ -89,7 +86,36 @@ const DatasetDetail = () => {
         return <Typography variant="h4" color="error">Dataset non trovato</Typography>;
     }
 
+    // Calcolo dei dati dell'istogramma in base al numero di utenti
+    const totalUsers = dataset.numUsers || 0;
+    const veryCold = Math.floor(totalUsers * 0.1);  // 10% degli utenti
+    const cold = Math.floor(totalUsers * 0.2);     // 20% degli utenti
+    const warm = Math.floor(totalUsers * 0.3);     // 30% degli utenti
+    const hot = totalUsers - (veryCold + cold + warm); // Resto per "Hot"
 
+    // Dati per l'istogramma
+    const histogramData = {
+        labels: ['Very Cold', 'Cold', 'Warm', 'Hot'], // Nuove etichette per il grafico
+        datasets: [
+            {
+                label: 'Numero di utenti',
+                data: [veryCold, cold, warm, hot],  // Assegna i valori calcolati per ogni categoria
+                backgroundColor: colors.blueAccent[500],
+                borderColor: colors.blueAccent[800],
+                borderWidth: 1,
+            },
+        ],
+    };
+
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false, // Permette di personalizzare le dimensioni
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+        },
+    };
 
     return (
         <Box display="flex" flexDirection="column" alignItems="center" p={3}>
@@ -159,7 +185,7 @@ const DatasetDetail = () => {
                         <Typography variant="body1" color={colors.grey[100]} mr={1}>
                             Valutazione:
                         </Typography>
-                        {dataset?.rating!== undefined ? (
+                        {dataset?.rating !== undefined ? (
                             <Rating
                                 value={dataset.rating} // Usa il valore del rating che è già stato impostato
                                 readOnly // Disabilita la modifica
@@ -179,8 +205,6 @@ const DatasetDetail = () => {
                             </Typography>
                         )}
                     </Box>
-
-
 
                     <Button
                         variant="contained"
@@ -205,8 +229,10 @@ const DatasetDetail = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                {/* Righe con le informazioni aggiuntive */}
-                                <TableCell sx={{ color: colors.grey[100] }}><strong>N. utenti:</strong> {dataset?.numUsers || "Dati non disponibili"}</TableCell>
+                                {/* Inseriamo il grafico al posto di N. utenti */}
+                                <TableCell sx={{ color: colors.grey[100], height: "100px", width: "100px" }}>
+                                    <Bar data={histogramData} options={chartOptions} />
+                                </TableCell>
                                 <TableCell sx={{ color: colors.grey[100] }}><strong>N. item:</strong> {dataset?.numItems || "Dati non disponibili"}</TableCell>
                                 <TableCell sx={{ color: colors.grey[100] }}><strong>N. ratings:</strong> {dataset?.numRatings || "Dati non disponibili"}</TableCell>
                                 <TableCell sx={{ color: colors.grey[100] }}><strong>Density:</strong> {dataset?.density || "Dati non disponibili"}</TableCell>
@@ -232,6 +258,7 @@ const DatasetDetail = () => {
 };
 
 export default DatasetDetail;
+
 
 
 
