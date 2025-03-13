@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Box, Card, CardContent, Typography, TextField, Button, IconButton, Radio, RadioGroup, FormControlLabel, MenuItem, FormControl, InputLabel, Select } from '@mui/material';
+import { Container, Box, Card, CardContent, Typography, TextField, Button, IconButton, Radio, RadioGroup, FormControlLabel, FormControl, InputLabel } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { tokens } from '../../theme';
 import Header from '../../components/Header';
@@ -71,7 +71,7 @@ const Add = () => {
                 <Card sx={{ backgroundColor: colors.primary[400], boxShadow: 3, borderRadius: 2 }}>
                     <CardContent>
                         {/* Titolo */}
-                        <Typography variant="h6" fontWeight="bold" gutterBottom>
+                        <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mb: 2 }}>
                             Titolo
                         </Typography>
                         <TextField
@@ -85,7 +85,7 @@ const Add = () => {
                         />
 
                         {/* Categoria */}
-                        <Typography variant="h6" fontWeight="bold" gutterBottom>
+                        <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mb: 2 }}>
                             Categoria
                         </Typography>
                         <TextField
@@ -99,7 +99,9 @@ const Add = () => {
                         />
 
                         {/* Selezione dell'immagine */}
-                        <Typography variant="h6" fontWeight="bold" gutterBottom mt={2}>Immagine</Typography>
+                        <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mb: 2 }} mt={2}>
+                            Immagine
+                        </Typography>
                         <FormControl component="fieldset" sx={{ mb: 2 }}>
                             <RadioGroup row value={dataset.imageType} onChange={(e) => setDataset({ ...dataset, imageType: e.target.value })}>
                                 <FormControlLabel value="url" control={<Radio />} label="URL" />
@@ -112,18 +114,25 @@ const Add = () => {
                             <input type="file" accept="image/*" onChange={(e) => setDataset({ ...dataset, imageFile: e.target.files[0] })} style={{ marginBottom: '16px' }} />
                         )}
 
-                        <Typography variant="h6" fontWeight="bold" gutterBottom mt={2}>
+                        <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mb: 2 }} mt={2}>
                             Aggiungi Campi al Dataset
                         </Typography>
                         <Box display="flex" gap={2}>
                             {/* Sezione per Selezionare il Campo e Aggiungere il Valore */}
                             <FormControl fullWidth sx={{ flex: 1 }}>
-                                <InputLabel>Seleziona Campo</InputLabel>
+                                <InputLabel shrink={!!selectedField}>Seleziona Campo</InputLabel>
                                 <Autocomplete
                                     value={selectedField}
                                     onChange={(event, newValue) => setSelectedField(newValue)}
                                     options={fields}
-                                    renderInput={(params) => <TextField {...params} label="Seleziona Campo" />}
+                                    getOptionLabel={(option) => option || ""}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label={selectedField ? "" : "Seleziona Campo"}
+                                            fullWidth
+                                        />
+                                    )}
                                     fullWidth
                                 />
                             </FormControl>
@@ -167,6 +176,7 @@ const Add = () => {
 };
 
 export default Add;
+
 
 
 
