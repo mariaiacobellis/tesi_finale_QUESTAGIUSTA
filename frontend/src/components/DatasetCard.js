@@ -19,7 +19,7 @@ const DatasetCard = ({ dataset }) => {
                 component="img"
                 alt={dataset.title}
                 height="140"
-                image={dataset.image}  // Immagine del dataset
+                image={dataset.img}  // Immagine del dataset
             />
             <CardContent>
                 <Typography gutterBottom variant="h5" component="div" sx={{ color: colors.grey[100] }}>

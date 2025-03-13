@@ -4,14 +4,13 @@ import DataList from '../../components/DatasetList';
 import Header from '../../components/Header';  // Importa il componente Header
 import {tokens, useMode} from '../../theme';
 import {useTheme} from "@mui/material/styles"; // Importa il tema da theme.js
-import data from "../../data";
 import axios from "axios";
 
 
 const Datasets = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const [datasetDb, setDatasetDb] = useState([]);
+    const [data, setData] = useState([]);
 
 
 
@@ -32,7 +31,7 @@ const Datasets = () => {
                 const response = await axios.get('http://localhost:5000/datasets/all');
                 console.log("Response:", response.data);
                 if (response.data.datasets) {
-                    setDatasetDb(response.data.datasets); // Aggiorna lo stato con i dataset ottenuti
+                    setData(response.data.datasets); // Aggiorna lo stato con i dataset ottenuti
                 } else {
                     console.error("Nessun dataset trovato nella risposta!");
                 }
