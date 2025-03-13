@@ -107,6 +107,27 @@ const DatasetDetail = () => {
         ],
     };
 
+    // Calcolo dei dati dell'istogramma in base al numero di utenti
+    const totalItems = dataset.numItems || 0;
+    const VeryCold = Math.floor(totalItems * 0.1);  // 10% degli utenti
+    const Cold = Math.floor(totalItems* 0.2);     // 20% degli utenti
+    const Warm = Math.floor(totalItems * 0.3);     // 30% degli utenti
+    const Popular = totalItems - (veryCold + cold + warm); // Resto per "Hot"
+
+    // Dati per l'istogramma
+    const histogramData2 = {
+        labels: ['Very Cold', 'Cold', 'Warm', 'Popular'], // Nuove etichette per il grafico
+        datasets: [
+            {
+                label: 'Numero items',
+                data: [VeryCold, Cold, Warm, Popular],  // Assegna i valori calcolati per ogni categoria
+                backgroundColor: colors.blueAccent[500],
+                borderColor: colors.blueAccent[800],
+                borderWidth: 1,
+            },
+        ],
+    };
+
     const chartOptions = {
         responsive: true,
         maintainAspectRatio: false, // Permette di personalizzare le dimensioni
@@ -116,6 +137,8 @@ const DatasetDetail = () => {
             },
         },
     };
+
+
 
     return (
         <Box display="flex" flexDirection="column" alignItems="center" p={3}>
@@ -233,7 +256,9 @@ const DatasetDetail = () => {
                                 <TableCell sx={{ color: colors.grey[100], height: "100px", width: "100px" }}>
                                     <Bar data={histogramData} options={chartOptions} />
                                 </TableCell>
-                                <TableCell sx={{ color: colors.grey[100] }}><strong>N. item:</strong> {dataset?.numItems || "Dati non disponibili"}</TableCell>
+                                <TableCell sx={{ color: colors.grey[100], height: "100px", width: "100px" }}>
+                                    <Bar data={histogramData2} options={chartOptions} />
+                                </TableCell>
                                 <TableCell sx={{ color: colors.grey[100] }}><strong>N. ratings:</strong> {dataset?.numRatings || "Dati non disponibili"}</TableCell>
                                 <TableCell sx={{ color: colors.grey[100] }}><strong>Density:</strong> {dataset?.density || "Dati non disponibili"}</TableCell>
                             </TableRow>
