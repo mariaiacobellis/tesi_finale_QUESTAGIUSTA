@@ -7,6 +7,12 @@ import cors from "cors"; // sistema di sicurezza
 import auth from "./routes/auth.js";
 import datasets from "./routes/datasets.js";
 
+import multer from "multer";
+import * as path from "node:path";
+import {fileURLToPath} from "url";
+import * as fs from "node:fs";
+
+
 
 const app = express();
 app.use(express.json());
@@ -128,13 +134,55 @@ db.connect((err) => {
         });
     });
 });
-
+const upload=multer({dest:'uploads/'})
 // Iniettiamo la connessione al db nelle richieste
 app.use((req, res, next) => {
     req.db = db;
     next();
 });
 
+app.post('/image',upload.single('image'),(req,res)=>{
+    if(!req.file){
+        res.send({code:500,msg:'err'})
+    }else{
+        res.send(req.file.filename)
+    }
+})
+
+
+
+
+// Configurazione di Multer per salvare i file nella cartella 'uploads'
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'routes/fileDataset/');
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.fieldname + "-" + Date.now() + path.extname(file.originalname));
+    },
+});
+
+const uploadFile = multer({ storage });
+
+// Endpoint per gestire l'upload del file
+app.post("/upload/file", uploadFile.single("file"), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ message: "Nessun file caricato." });
+    }
+
+    // Legge il file TSV
+
+
+        res.json({ message: "File caricato con successo!", data: req.file.path});
+
+});
+app.get('/image/:id',(req,res)=>{
+    res.contentType('image/jpeg');
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    res.sendFile(path.join(__dirname,'/uploads',req.params.id));
+
+})
 app.use("/auth", auth);
 app.use("/datasets", datasets);
 //app.use("/comments", comments); // Aggiungi il router dei commenti

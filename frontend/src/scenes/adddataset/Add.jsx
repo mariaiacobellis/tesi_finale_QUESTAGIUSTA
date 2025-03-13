@@ -49,7 +49,35 @@ const Add = () => {
             return;
         }
 
-        const formData = new FormData();
+
+        if (dataset.tsvFile){
+            const formData = new FormData();
+            formData.append('file', dataset.tsvFile);
+            const fileResponse=await axios.post("http://localhost:5000/upload/file", formData);
+            const stringa = String(fileResponse.data.data);
+            const fileName = String(stringa.split(/[/\\]/).pop());
+            console.log(fileResponse.data)
+            console.log(fileName)
+        } else {
+            alert("Il file TSV è obbligatorio")
+            return;
+        }
+
+
+        if(dataset.imageFile){
+            const formDataimage = new FormData();
+            formDataimage.append('image', dataset.imageFile);
+            const imageResponse=await axios.post("http://localhost:5000/image", formDataimage);
+            dataset.imageUrl="http://localhost:5000/image/"+imageResponse.data
+            console.log(imageResponse)
+        } else {
+            if (!dataset.imageUrl){
+                dataset.imageUrl="https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png"
+            }
+        }
+
+
+        /*  const formData = new FormData();
         Object.entries(dataset).forEach(([key, value]) => {
             formData.append(key, value);
         });
@@ -61,7 +89,7 @@ const Add = () => {
             console.log(response);
         } catch (error) {
             console.error("Errore durante il caricamento del dataset:", error);
-        }
+        }  */
     };
 
     return (
@@ -97,6 +125,11 @@ const Add = () => {
                             onChange={(e) => setDataset({ ...dataset, category: e.target.value })}
                             sx={{ mb: 2 }}
                         />
+
+                        <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mb: 2 }} mt={2}>
+                            Carica File TSV
+                        </Typography>
+                        <input type="file" accept=".tsv" onChange={(e) => setDataset({ ...dataset, tsvFile: e.target.files[0] })} style={{ marginBottom: '16px' }} />
 
                         {/* Selezione dell'immagine */}
                         <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mb: 2 }} mt={2}>
