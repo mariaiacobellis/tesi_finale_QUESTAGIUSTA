@@ -19,8 +19,10 @@ const readTSVFile = (nomeFile) => {
 // Registrazione utente
 router.post("/add", async (req, res) => {
     const db = req.db; // Connessione al database
+    console.log(req.body)
 
     // Estrai i dati e imposta NULL se non esistono
+    const status = "Pending";
     const {
         author, editor, title, booktitle, pages, series, volume, publisher,
         year, number, location, address, keywords, url, doi, timestamp,
@@ -29,6 +31,7 @@ router.post("/add", async (req, res) => {
 
     // Converte undefined → NULL per sicurezza
     const publicationData = [
+
         author || null,
         editor || null,
         title || null,
@@ -55,14 +58,15 @@ router.post("/add", async (req, res) => {
         numRatings || 0.0,
         numUsers || 0.0,
         numItems || 0.0,
-        density || 0.0
+        density || 0.0,
+        status
     ];
 
     const sql = `
         INSERT INTO datasets (
             author, editor, title, booktitle, pages, series, volume, publisher, year,
-            number, location, address, keywords, url, doi, timestamp, biburl, bibsource, journal, rating, storage, category, img, numRatings, numUsers, numItems, density
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            number, location, address, keywords, url, doi, timestamp, biburl, bibsource, journal, rating, storage, category, img, numRatings, numUsers, numItems, density, status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
     `;
 
     db.query(sql, publicationData, (err, result) => {
@@ -94,7 +98,22 @@ router.get("/get/:id", (req, res) => {
 router.get("/all", (req, res) => {
     const db = req.db;
 
-    const sql = "SELECT * FROM datasets";
+    const sql = "SELECT * FROM datasets WHERE status='Approved'";
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error("❌ Errore nel recupero dei dataset:", err);
+            return res.status(500).json({ error: "Errore nel database", details: err });
+        }
+        res.json({ datasets: results });
+    });
+});
+
+// Ottenere tutti i dataset presenti nel sistema
+router.get("/all/pending", (req, res) => {
+    const db = req.db;
+
+    const sql = "SELECT * FROM datasets WHERE status='Pending'";
 
     db.query(sql, (err, results) => {
         if (err) {
@@ -120,4 +139,41 @@ router.get("/getFile/:id", (req, res) =>{
     res.json(paginatedData);
 } );
 
+router.put("/status/:id", (req, res) => {
+    const datasetId = req.params.id;
+    const db = req.db; // Connessione al database
+    const sql = "UPDATE datasets SET status = 'Approved' WHERE id = ?";
+
+    db.query(sql, [datasetId], (err, result) => {
+        if (err) {
+            console.error("Errore nell'approvazione del dataset:", err);
+            return res.status(500).json({ message: "Errore interno del server" });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Dataset non trovato" });
+        }
+
+        res.status(200).json({ message: "Dataset approvato con successo" });
+    });
+});
+
+router.delete("/:id", (req, res) => {
+    const datasetId = req.params.id;
+    const db = req.db; // Connessione al database
+    const sql = "DELETE FROM datasets WHERE id = ?";
+
+    db.query(sql, [datasetId], (err, result) => {
+        if (err) {
+            console.error("Errore nell'eliminazione del dataset:", err);
+            return res.status(500).json({ message: "Errore interno del server" });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Dataset non trovato" });
+        }
+
+        res.status(200).json({ message: "Dataset eliminato con successo" });
+    });
+});
 export default router;

@@ -6,6 +6,7 @@ import Header from '../../components/Header';
 import axios from "axios";
 import DeleteIcon from '@mui/icons-material/Delete';
 import Autocomplete from '@mui/material/Autocomplete';
+import data from "../../data";
 
 const fields = [
     "author", "editor", "booktitle", "pages", "series", "volume", "publisher",
@@ -56,8 +57,7 @@ const Add = () => {
             const fileResponse=await axios.post("http://localhost:5000/upload/file", formData);
             const stringa = String(fileResponse.data.data);
             const fileName = String(stringa.split(/[/\\]/).pop());
-            console.log(fileResponse.data)
-            console.log(fileName)
+            dataset.storage=fileName
         } else {
             alert("Il file TSV è obbligatorio")
             return;
@@ -68,28 +68,27 @@ const Add = () => {
             const formDataimage = new FormData();
             formDataimage.append('image', dataset.imageFile);
             const imageResponse=await axios.post("http://localhost:5000/image", formDataimage);
-            dataset.imageUrl="http://localhost:5000/image/"+imageResponse.data
+            dataset.img="http://localhost:5000/image/"+imageResponse.data
             console.log(imageResponse)
         } else {
             if (!dataset.imageUrl){
-                dataset.imageUrl="https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png"
+                dataset.img="https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png"
             }
         }
 
 
-        /*  const formData = new FormData();
-        Object.entries(dataset).forEach(([key, value]) => {
-            formData.append(key, value);
-        });
+
+        console.log(dataset)
+
+
 
         try {
-            const response = await axios.post("http://localhost:5000/datasets/add", formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
-            });
+            const response = await axios.post("http://localhost:5000/datasets/add",
+                dataset);
             console.log(response);
         } catch (error) {
             console.error("Errore durante il caricamento del dataset:", error);
-        }  */
+        }
     };
 
     return (

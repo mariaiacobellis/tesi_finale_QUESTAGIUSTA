@@ -165,7 +165,7 @@ const DatasetDetail = () => {
                         {Object.entries(dataset || {})
                             .filter(([key, value]) =>
                                 value &&
-                                !["keywords", "storage", "category", "img", "rating", "id", "numRatings", "numUsers", "numItems", "density"].includes(key)
+                                !["keywords", "storage", "category", "img", "rating", "id", "numRatings", "numUsers", "numItems", "density","status","title"].includes(key)
                             )
                             .map(([key, value]) => (
                                 <Grid item xs={12} sm={6} key={key}>

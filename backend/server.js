@@ -102,7 +102,8 @@ db.connect((err) => {
                     numRatings FLOAT ,  -- Numero di valutazioni
                     numUsers FLOAT,    -- Numero di utenti
                     numItems FLOAT ,    -- Numero di item
-                    density FLOAT  -- Densità del dataset
+                    density FLOAT,  -- Densità del dataset
+                    status TEXT
                 )
             `;
             dbWithDB.query(createDatasetsTable, (err, result) => {
@@ -163,6 +164,7 @@ const storage = multer.diskStorage({
 });
 
 const uploadFile = multer({ storage });
+
 
 // Endpoint per gestire l'upload del file
 app.post("/upload/file", uploadFile.single("file"), (req, res) => {

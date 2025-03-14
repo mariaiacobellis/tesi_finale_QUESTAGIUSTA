@@ -45,6 +45,10 @@ const Topbar = () => {
         setOpen(false);
         navigate("/login"); // Porta l'utente alla pagina di login
     };
+    const onAdmin= () => {
+        setOpen(false);
+        navigate("/admin"); // Porta l'utente alla pagina di login
+    };
 
 
 
@@ -119,6 +123,7 @@ const Topbar = () => {
                 }}
             >
                 <MenuItem onClick={()=> onLogout()}>Logout</MenuItem>
+                {localStorage.getItem("username") == "admin" &&<MenuItem onClick={()=> onAdmin()}>Admin</MenuItem>}
             </Menu>
 
         </>

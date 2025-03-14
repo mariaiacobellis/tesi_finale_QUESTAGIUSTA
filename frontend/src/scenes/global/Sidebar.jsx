@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, Typography, useTheme, useMediaQuery } from "@mui/material";
 import { Link } from "react-router-dom";
 import { tokens } from "../../theme";
@@ -14,6 +14,9 @@ const Sidebar = () => {
     const colors = tokens(theme.palette.mode);
     const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // True se lo schermo è piccolo
     const [selected, setSelected] = useState("Homepage");
+    const [admin, setAdmin] = useState("")
+
+
 
     return (
         <Drawer

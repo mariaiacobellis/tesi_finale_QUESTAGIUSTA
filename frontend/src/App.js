@@ -12,6 +12,7 @@ import Datasets from './scenes/datasets/Datasets';
 import DatasetDetail from './DatasetDetail';  // Importata la pagina del singolo dataset
 import Discussion from './scenes/discussion/Discussion';
 import Add from './scenes/adddataset/Add';
+import Admin from "./scenes/admin/Admin";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -35,6 +36,7 @@ function App() {
                 <Route path="/discussion" element={<Discussion />} />
                 <Route path="/discussion/:id" element={<Discussion />} />
                 <Route path="/adddatasets" element={<Add />} />
+                <Route path="/admin" element={<Admin />} />
               </Routes>
             </main>
           </div>
