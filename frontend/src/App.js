@@ -13,6 +13,7 @@ import DatasetDetail from './DatasetDetail';  // Importata la pagina del singolo
 import Discussion from './scenes/discussion/Discussion';
 import Add from './scenes/adddataset/Add';
 import Admin from "./scenes/admin/Admin";
+import DatasetVoteComment from "./DatasetVoteComment";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -37,6 +38,7 @@ function App() {
                 <Route path="/discussion/:id" element={<Discussion />} />
                 <Route path="/adddatasets" element={<Add />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/vote/:id" element={<DatasetVoteComment />} /> {/* La route per commentare */}
               </Routes>
             </main>
           </div>

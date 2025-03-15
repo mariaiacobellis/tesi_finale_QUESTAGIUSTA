@@ -138,11 +138,10 @@ const DatasetDetail = () => {
         },
     };
 
-
-
     return (
-        <Box display="flex" flexDirection="column" alignItems="center" p={3}>
-            <Card sx={{ maxWidth: 800, width: '100%', backgroundColor: colors.primary[400], boxShadow: 3, borderRadius: 2, mb: 3 }}>
+        <Box p={3} sx={{ width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
+            {/* Contenitore superiore */}
+            <Card sx={{ width: '100%', backgroundColor: colors.primary[400], boxShadow: 3, borderRadius: 2, mb: 3 }}>
                 <CardMedia
                     component="img"
                     height="300"
@@ -161,11 +160,11 @@ const DatasetDetail = () => {
                     </Typography>
 
                     {/* Griglia con tutti i campi */}
-                    <Grid container spacing={2} mt={2}>
+                    <Grid container spacing={2} mt={2} sx={{ maxWidth: '100%', width: '100%' }}>
                         {Object.entries(dataset || {})
                             .filter(([key, value]) =>
                                 value &&
-                                !["keywords", "storage", "category", "img", "rating", "id", "numRatings", "numUsers", "numItems", "density","status","title"].includes(key)
+                                !["keywords", "storage", "category", "img", "rating", "id", "numRatings", "numUsers", "numItems", "density", "status", "title"].includes(key)
                             )
                             .map(([key, value]) => (
                                 <Grid item xs={12} sm={6} key={key}>
@@ -232,16 +231,17 @@ const DatasetDetail = () => {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={() => navigate(`/discussion/${id}`)}
+                        onClick={() => navigate(`/vote/${id}`)} // Aggiungi l'ID del dataset
                         sx={{ mt: 2 }}
                     >
                         Vota e commenta dataset
                     </Button>
+
                 </CardContent>
             </Card>
 
-            {/* Tabella con infinite scroll */}
-            <TableContainer component={Paper} sx={{ maxWidth: 800, backgroundColor: colors.primary[400] }}>
+            {/* Contenitore inferiore (tabella) */}
+            <TableContainer component={Paper} sx={{ width: '100%', backgroundColor: colors.primary[400] }}>
                 <InfiniteScroll
                     dataLength={rows.length} // La lunghezza attuale dei dati
                     next={fetchData} // Funzione di caricamento dei dati
@@ -266,11 +266,8 @@ const DatasetDetail = () => {
                         <TableBody>
                             {rows.map((row, index) => (
                                 <TableRow key={index}>
-                                    {/* Genera dinamicamente le righe della tabella */}
-                                    {columns.map((col) => (
-                                        <TableCell key={col.id} sx={{ color: colors.grey[100] }}>
-                                            {row[col.id]}
-                                        </TableCell>
+                                    {Object.entries(row).map(([key, value]) => (
+                                        <TableCell key={key}>{value}</TableCell>
                                     ))}
                                 </TableRow>
                             ))}
@@ -283,6 +280,8 @@ const DatasetDetail = () => {
 };
 
 export default DatasetDetail;
+
+
 
 
 
