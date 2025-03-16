@@ -39,22 +39,30 @@ const DatasetVoteComment = () => {
     }, [id, userId]);
 
     const handleCommentSubmit = async () => {
+        if (!isLoggedIn) {
+            alert("Per commentare bisogna effettuare l'accesso.");
+            navigate("/login", { state: { from: location.pathname } }); // Salva la pagina attuale
+            return;
+        }
+
         if (newComment.trim()) {
             try {
                 const response = await axios.post(`http://localhost:5000/comments/add`, {
                     datasetId: id,
                     comment: newComment,
-                    userId: userId, // Aggiungi l'ID dell'utente che commenta
-                    rating: rating, // Invia il voto con le stelline
+                    userId: userId,
+                    rating: rating,
                 });
                 setComments([response.data, ...comments]);
                 setNewComment("");
-                setRating(0); // Reset del voto
+                setRating(0);
             } catch (error) {
                 console.error("Errore nell'aggiunta del commento:", error);
             }
         }
     };
+
+
 
     return (
         <Box p={3} sx={{ width: '100%', maxWidth: '1200px', margin: '0 auto' }}>

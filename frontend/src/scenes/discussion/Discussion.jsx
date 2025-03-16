@@ -4,24 +4,24 @@ import { useTheme } from '@mui/material/styles';
 import { tokens } from '../../theme';
 import Header from '../../components/Header';
 import { ExpandMore as ExpandMoreIcon, Comment as CommentIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
 const discussions = [
     {
-        title: 'Discussione 1',
-        description: 'Questa è la descrizione della discussione 1. Clicca per vedere i commenti.',
+        title: 'Caricamento più rapido dei dataset',
+        description: 'Potreste ottimizzare il tempo di caricamento dei dataset, magari introducendo caricamenti asincroni, paginazione o caricamento "lazy" dei dati per migliorare l’esperienza utente.',
         comments: [
-            { id: 1, text: 'Questo è il primo commento sulla discussione 1.' },
-            { id: 2, text: 'Altro commento interessante sulla discussione 1.' }
+            { id: 1, text: 'Sì, anche io ho notato che a volte ci vuole un po\' di tempo per caricare i dataset. Penso che un sistema di caricamento asincrono potrebbe davvero aiutare!' },
+            { id: 2, text: 'Concordo! Un caricamento più veloce sarebbe fantastico. Magari una funzione di paginazione o il caricamento lazy potrebbero essere utili per migliorare la velocità.' }
         ]
     },
     {
-        title: 'Discussione 2',
-        description: 'Questa è la descrizione della discussione 2. Clicca per vedere i commenti.',
+        title: 'Aggiunta delle notifiche',
+        description: 'Ci vorrebbe un sistema di notifiche per quando un dataset viene approvato o quando ci sono aggiornamenti.',
         comments: [
-            { id: 1, text: 'Commento sulla discussione 2.' },
-            { id: 2, text: 'Un altro commento sulla discussione 2.' }
+            { id: 1, text: 'Anche io lo penso! Sarebbe fantastico ricevere notifiche quando un dataset che abbiamo caricato viene approvato o aggiornato.' },
+            { id: 2, text: 'Assolutamente! Inoltre, un sistema di notifiche sarebbe utile anche per gli aggiornamenti sui dataset che seguiamo, così da rimanere sempre informati.' }
         ]
     }
 ];
@@ -38,6 +38,9 @@ const DiscussionPage = () => {
     const [openCommentDialog, setOpenCommentDialog] = useState(false);
     const [selectedDiscussionIndex, setSelectedDiscussionIndex] = useState(null);
     const [newCommentText, setNewCommentText] = useState('');
+
+    const navigate = useNavigate();
+    const location = useLocation(); // Ottieni la pagina di origine per il reindirizzamento
 
     useEffect(() => {
         const fetchDataset = async () => {
@@ -74,7 +77,20 @@ const DiscussionPage = () => {
         setDiscussionsState(updatedDiscussions);
     };
 
+    const handleDeleteDiscussion = (discussionIndex) => {
+        const updatedDiscussions = discussionsState.filter((_, index) => index !== discussionIndex);
+        setDiscussionsState(updatedDiscussions);
+    };
+
     const handleAddDiscussion = () => {
+        const isLoggedIn = localStorage.getItem('username'); // Verifica se l'utente è loggato
+
+        if (!isLoggedIn) {
+            // Se non loggato, reindirizza alla pagina di login passando il percorso della discussione
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+
         if (newDiscussionText.trim()) {
             const newDiscussion = {
                 title: 'Nuova Discussione',
@@ -88,6 +104,14 @@ const DiscussionPage = () => {
     };
 
     const handleAddComment = () => {
+        const isLoggedIn = localStorage.getItem('username'); // Verifica se l'utente è loggato
+
+        if (!isLoggedIn) {
+            // Se non loggato, reindirizza alla pagina di login passando il percorso della discussione
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+
         if (newCommentText.trim()) {
             const updatedDiscussions = discussionsState.map((discussion, index) => {
                 if (index === selectedDiscussionIndex) {
@@ -136,10 +160,13 @@ const DiscussionPage = () => {
                                 <Typography variant="h6" fontWeight="bold">
                                     {discussion.title}
                                 </Typography>
+                            </Box>
+                            <Box display="flex" flexDirection="column" sx={{ cursor: 'pointer', mt: 1 }}>
                                 <Typography variant="body2" color={colors.grey[600]}>
                                     {discussion.description}
                                 </Typography>
                             </Box>
+
 
                             <Box
                                 display="flex"
@@ -181,10 +208,10 @@ const DiscussionPage = () => {
                                 </Box>
                             </Collapse>
 
-                            {/* Bottone per aggiungere commento */}
                             <Box
                                 display="flex"
-                                justifyContent="flex-end"
+                                justifyContent="space-between"
+                                alignItems="center"
                                 mt={2}
                             >
                                 <Button
@@ -196,6 +223,15 @@ const DiscussionPage = () => {
                                     }}
                                 >
                                     Aggiungi commento
+                                </Button>
+
+                                {/* Sostituito IconButton con Button */}
+                                <Button
+                                    variant="outlined"
+                                    color="error"
+                                    onClick={() => handleDeleteDiscussion(discussionIndex)}
+                                >
+                                    Elimina discussione
                                 </Button>
                             </Box>
                         </CardContent>
@@ -274,6 +310,9 @@ const DiscussionPage = () => {
 };
 
 export default DiscussionPage;
+
+
+
 
 
 

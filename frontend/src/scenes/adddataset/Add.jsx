@@ -6,7 +6,7 @@ import Header from '../../components/Header';
 import axios from "axios";
 import DeleteIcon from '@mui/icons-material/Delete';
 import Autocomplete from '@mui/material/Autocomplete';
-import data from "../../data";
+
 
 const fields = [
     "author", "editor", "booktitle", "pages", "series", "volume", "publisher",

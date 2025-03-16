@@ -1,7 +1,7 @@
 import { Container, TextField, Button, Typography, Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { tokens } from "../../theme";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useLocation} from "react-router-dom";
 import {useState} from "react";
 import axios from "axios";
 
@@ -10,22 +10,27 @@ const LoginPage = () => {
     const colors = tokens(theme.palette.mode);
 
     const navigate = useNavigate();
+    const location = useLocation();
     const [username,setUsername] = useState("");
     const [password,setPassword] = useState("");
     const [error, setError] = useState("");
 
     const onLogin = async () => {
-        try{
+        try {
             setError(""); // Rimuove il messaggio di errore se il login è corretto
-            const res = await axios.post("http://localhost:5000/auth/login",{
-                username:username,
-                password:password});
+            const res = await axios.post("http://localhost:5000/auth/login", {
+                username: username,
+                password: password,
+            });
             localStorage.setItem('username', username);
-            navigate('/')
-        }catch (error) {
-            setError("Email o password non validi"); // Imposta il messaggio di errore}
+
+            // Se c'è una pagina precedente salvata, reindirizza lì. Altrimenti, vai alla home
+            const redirectPath = location.state?.from || "/"; // Default alla home
+            navigate(redirectPath);
+        } catch (error) {
+            setError("Email o password non validi");
         }
-    }
+    };
 
 
     return (
