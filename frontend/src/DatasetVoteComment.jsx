@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { Box, Typography, Button, Paper, TextField, useTheme, Rating } from "@mui/material";
+import { Box, Typography, Button, Paper, TextField, useTheme, Rating, Snackbar, Alert } from "@mui/material";
 import { tokens } from "../src/theme"; // Importa i tuoi colori definiti nel tema
 import axios from "axios";
 
@@ -19,7 +19,25 @@ const DatasetVoteComment = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false); // Stato per verificare se l'utente è loggato
     const [userId, setUserId] = useState(null); // ID dell'utente loggato
 
+    // Stato per gestire la Snackbar
+    const [openSnackbar, setOpenSnackbar] = useState(false); // Stato per mostrare la Snackbar
+
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false); // Chiudi la Snackbar
+    };
+
     useEffect(() => {
+        // Controlla se l'utente è loggato
+        const checkLoginStatus = () => {
+            const loggedInUser = localStorage.getItem("userId");
+            if (loggedInUser) {
+                setIsLoggedIn(true);
+                setUserId(loggedInUser);
+            }
+        };
+
+        checkLoginStatus();
+
         const fetchDataset = async () => {
             try {
                 const datasetResponse = await axios.get(`http://localhost:5000/datasets/get/${id}`);
@@ -40,8 +58,11 @@ const DatasetVoteComment = () => {
 
     const handleCommentSubmit = async () => {
         if (!isLoggedIn) {
-            alert("Per commentare bisogna effettuare l'accesso.");
-            navigate("/login", { state: { from: location.pathname } }); // Salva la pagina attuale
+            // Se l'utente non è loggato, mostra la Snackbar
+            setOpenSnackbar(true);  // Abilita la Snackbar
+            // Salva la pagina attuale per il reindirizzamento
+            localStorage.setItem("redirectAfterLogin", location.pathname);
+            navigate("/login"); // Vai alla pagina di login
             return;
         }
 
@@ -62,7 +83,16 @@ const DatasetVoteComment = () => {
         }
     };
 
-
+    useEffect(() => {
+        // Dopo il login, reindirizza l'utente alla pagina precedente (se disponibile)
+        if (isLoggedIn) {
+            const redirectTo = localStorage.getItem("redirectAfterLogin");
+            if (redirectTo) {
+                localStorage.removeItem("redirectAfterLogin");
+                navigate(redirectTo);
+            }
+        }
+    }, [isLoggedIn, navigate]);
 
     return (
         <Box p={3} sx={{ width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
@@ -133,11 +163,33 @@ const DatasetVoteComment = () => {
                     </Typography>
                 )}
             </Box>
+
+            {/* Snackbar per avvisare l'utente che deve effettuare il login */}
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={3000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }} // Posizione al centro
+                sx={{
+                    position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: 9999,
+                }}
+            >
+                <Alert severity="warning">
+                    Per aggiungere un commento devi effettuare il login
+                </Alert>
+            </Snackbar>
         </Box>
     );
 };
 
 export default DatasetVoteComment;
+
+
+
 
 
 
