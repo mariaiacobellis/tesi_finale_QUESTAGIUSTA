@@ -1,12 +1,28 @@
 import React, { useState } from 'react';
-import { Container, Box, Card, CardContent, Typography, TextField, Button, IconButton, Radio, RadioGroup, FormControlLabel, FormControl, InputLabel } from '@mui/material';
+import {
+    Container,
+    Box,
+    Card,
+    CardContent,
+    Typography,
+    TextField,
+    Button,
+    IconButton,
+    Radio,
+    RadioGroup,
+    FormControlLabel,
+    FormControl,
+    InputLabel,
+    Snackbar,
+    Alert
+} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { tokens } from '../../theme';
 import Header from '../../components/Header';
 import axios from "axios";
 import DeleteIcon from '@mui/icons-material/Delete';
 import Autocomplete from '@mui/material/Autocomplete';
-
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const fields = [
     "author", "editor", "booktitle", "pages", "series", "volume", "publisher",
@@ -17,11 +33,14 @@ const fields = [
 const Add = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const navigate = useNavigate();
+    const location = useLocation();
 
     const [dataset, setDataset] = useState({ title: '', category: '', file: null, imageType: 'url', imageUrl: '', imageFile: null });
     const [selectedField, setSelectedField] = useState("");
     const [fieldValue, setFieldValue] = useState("");
     const [addedFields, setAddedFields] = useState([]);
+    const [openSnackbar, setOpenSnackbar] = useState(false); // Stato per il Snackbar
 
     const handleAddField = () => {
         if (!selectedField || !fieldValue) return;
@@ -40,6 +59,17 @@ const Add = () => {
     };
 
     const handleSubmit = async () => {
+        const isLoggedIn = localStorage.getItem('username'); // Verifica se l'utente è loggato
+        if (!isLoggedIn) {
+            // Se non loggato, salva la pagina corrente e redirige alla login
+            localStorage.setItem('redirectAfterLogin', '/adddatasets');
+            setOpenSnackbar(true); // Apre il banner
+            setTimeout(() => {
+                navigate('/login'); // Redirige alla pagina di login dopo che il banner è stato mostrato
+            }, 3000); // Aspetta 3 secondi prima di fare il reindirizzamento
+            return;
+        }
+
         if (!dataset.title) {
             alert("Il titolo è obbligatorio.");
             return;
@@ -50,45 +80,42 @@ const Add = () => {
             return;
         }
 
-
-        if (dataset.tsvFile){
+        if (dataset.tsvFile) {
             const formData = new FormData();
             formData.append('file', dataset.tsvFile);
-            const fileResponse=await axios.post("http://localhost:5000/upload/file", formData);
+            const fileResponse = await axios.post("http://localhost:5000/upload/file", formData);
             const stringa = String(fileResponse.data.data);
             const fileName = String(stringa.split(/[/\\]/).pop());
-            dataset.storage=fileName
+            dataset.storage = fileName;
         } else {
-            alert("Il file TSV è obbligatorio")
+            alert("Il file TSV è obbligatorio");
             return;
         }
 
-
-        if(dataset.imageFile){
+        if (dataset.imageFile) {
             const formDataimage = new FormData();
             formDataimage.append('image', dataset.imageFile);
-            const imageResponse=await axios.post("http://localhost:5000/image", formDataimage);
-            dataset.img="http://localhost:5000/image/"+imageResponse.data
-            console.log(imageResponse)
+            const imageResponse = await axios.post("http://localhost:5000/image", formDataimage);
+            dataset.img = "http://localhost:5000/image/" + imageResponse.data;
+            console.log(imageResponse);
         } else {
-            if (!dataset.imageUrl){
-                dataset.img="https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png"
+            if (!dataset.imageUrl) {
+                dataset.img = "https://www.data4impactproject.org/wp-content/uploads/2023/11/datasets_transparent.png";
             }
         }
 
-
-
-        console.log(dataset)
-
-
+        console.log(dataset);
 
         try {
-            const response = await axios.post("http://localhost:5000/datasets/add",
-                dataset);
+            const response = await axios.post("http://localhost:5000/datasets/add", dataset);
             console.log(response);
         } catch (error) {
             console.error("Errore durante il caricamento del dataset:", error);
         }
+    };
+
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
     };
 
     return (
@@ -125,6 +152,7 @@ const Add = () => {
                             sx={{ mb: 2 }}
                         />
 
+                        {/* Carica File TSV */}
                         <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mb: 2 }} mt={2}>
                             Carica File TSV
                         </Typography>
@@ -146,6 +174,7 @@ const Add = () => {
                             <input type="file" accept="image/*" onChange={(e) => setDataset({ ...dataset, imageFile: e.target.files[0] })} style={{ marginBottom: '16px' }} />
                         )}
 
+                        {/* Aggiungi Campi al Dataset */}
                         <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mb: 2 }} mt={2}>
                             Aggiungi Campi al Dataset
                         </Typography>
@@ -203,11 +232,35 @@ const Add = () => {
                     </CardContent>
                 </Card>
             </Box>
+
+            {/* Snackbar per il messaggio di login */}
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={3000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }} // Posizione al centro
+                sx={{
+                    position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: 9999,
+                }}
+            >
+                <Alert severity="warning">
+                    Per aggiungere un dataset devi effettuare il login
+                </Alert>
+            </Snackbar>
         </Container>
     );
 };
 
 export default Add;
+
+
+
+
+
 
 
 

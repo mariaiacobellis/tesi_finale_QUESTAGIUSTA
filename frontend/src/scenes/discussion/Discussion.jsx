@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Box, Card, CardContent, Typography, IconButton, Collapse, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
+import { Container, Box, Card, CardContent, Typography, IconButton, Collapse, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Button, Snackbar, Alert } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { tokens } from '../../theme';
 import Header from '../../components/Header';
@@ -38,27 +38,20 @@ const DiscussionPage = () => {
     const [openCommentDialog, setOpenCommentDialog] = useState(false);
     const [selectedDiscussionIndex, setSelectedDiscussionIndex] = useState(null);
     const [newCommentText, setNewCommentText] = useState('');
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
 
     const navigate = useNavigate();
-    const location = useLocation(); // Ottieni la pagina di origine per il reindirizzamento
+    const location = useLocation();
 
     useEffect(() => {
         const fetchDataset = async () => {
             try {
-                console.log('Fetching dataset with ID:', id);
                 const response = await axios.get(`http://localhost:5000/datasets/get/${id}`);
-                console.log('Response:', response.data);
-
-                if (response.data.datasets) {
-                    setDataset(response.data.datasets);
-                } else {
-                    console.error('Nessun dataset trovato nella risposta!');
-                }
+                if (response.data.datasets) setDataset(response.data.datasets);
             } catch (error) {
                 console.error('Errore nel fetch del dataset:', error);
             }
         };
-
         fetchDataset();
     }, [id]);
 
@@ -66,67 +59,48 @@ const DiscussionPage = () => {
         setOpenIndex(openIndex === index ? null : index);
     };
 
-    const handleDeleteComment = (discussionIndex, commentId) => {
-        const updatedDiscussions = discussionsState.map((discussion, index) => {
-            if (index === discussionIndex) {
-                const updatedComments = discussion.comments.filter(comment => comment.id !== commentId);
-                return { ...discussion, comments: updatedComments };
-            }
-            return discussion;
-        });
-        setDiscussionsState(updatedDiscussions);
-    };
-
-    const handleDeleteDiscussion = (discussionIndex) => {
-        const updatedDiscussions = discussionsState.filter((_, index) => index !== discussionIndex);
-        setDiscussionsState(updatedDiscussions);
-    };
-
     const handleAddDiscussion = () => {
-        const isLoggedIn = localStorage.getItem('username'); // Verifica se l'utente è loggato
+        const isLoggedIn = localStorage.getItem('username');
 
         if (!isLoggedIn) {
-            // Se non loggato, reindirizza alla pagina di login passando il percorso della discussione
-            navigate('/login', { state: { from: location.pathname } });
+            setSnackbarOpen(true); // Mostra il banner
             return;
         }
 
         if (newDiscussionText.trim()) {
-            const newDiscussion = {
-                title: 'Nuova Discussione',
-                description: newDiscussionText,
-                comments: []
-            };
-            setDiscussionsState([newDiscussion, ...discussionsState]);
+            setDiscussionsState([{ title: 'Nuova Discussione', description: newDiscussionText, comments: [] }, ...discussionsState]);
             setOpenDialog(false);
             setNewDiscussionText('');
         }
     };
 
     const handleAddComment = () => {
-        const isLoggedIn = localStorage.getItem('username'); // Verifica se l'utente è loggato
+        const isLoggedIn = localStorage.getItem('username');
 
         if (!isLoggedIn) {
-            // Se non loggato, reindirizza alla pagina di login passando il percorso della discussione
-            navigate('/login', { state: { from: location.pathname } });
+            setSnackbarOpen(true); // Mostra il banner
             return;
         }
 
         if (newCommentText.trim()) {
             const updatedDiscussions = discussionsState.map((discussion, index) => {
                 if (index === selectedDiscussionIndex) {
-                    const newComment = {
-                        id: discussion.comments.length + 1,
-                        text: newCommentText
-                    };
-                    return { ...discussion, comments: [...discussion.comments, newComment] };
+                    return { ...discussion, comments: [...discussion.comments, { id: discussion.comments.length + 1, text: newCommentText }] };
                 }
                 return discussion;
             });
+
             setDiscussionsState(updatedDiscussions);
             setOpenCommentDialog(false);
             setNewCommentText('');
         }
+    };
+
+    const handleCloseSnackbar = () => {
+        // Salva la pagina corrente nel localStorage
+        localStorage.setItem('redirectAfterLogin', location.pathname);
+        setSnackbarOpen(false);
+        navigate('/login'); // Reindirizza alla pagina di login
     };
 
     return (
@@ -146,45 +120,23 @@ const DiscussionPage = () => {
 
             <Box display="flex" flexDirection="column" gap={2}>
                 {discussionsState.map((discussion, discussionIndex) => (
-                    <Card
-                        key={discussionIndex}
-                        sx={{
-                            backgroundColor: colors.primary[400],
-                            boxShadow: 3,
-                            borderRadius: 2,
-                            mb: discussionIndex === discussionsState.length - 1 ? 4 : 0
-                        }}
-                    >
+                    <Card key={discussionIndex} sx={{ backgroundColor: colors.primary[400], boxShadow: 3, borderRadius: 2, mb: discussionIndex === discussionsState.length - 1 ? 4 : 0 }}>
                         <CardContent>
                             <Box display="flex" flexDirection="column" mb={2} sx={{ cursor: 'pointer' }}>
                                 <Typography variant="h6" fontWeight="bold">
                                     {discussion.title}
                                 </Typography>
                             </Box>
-                            <Box display="flex" flexDirection="column" sx={{ cursor: 'pointer', mt: 1 }}>
-                                <Typography variant="body2" color={colors.grey[600]}>
-                                    {discussion.description}
-                                </Typography>
-                            </Box>
+                            <Typography variant="body2" color={colors.grey[600]}>
+                                {discussion.description}
+                            </Typography>
 
-
-                            <Box
-                                display="flex"
-                                justifyContent="space-between"
-                                alignItems="center"
-                                sx={{ cursor: 'pointer' }}
-                                onClick={() => handleToggle(discussionIndex)}
-                            >
+                            <Box display="flex" justifyContent="space-between" alignItems="center" onClick={() => handleToggle(discussionIndex)}>
                                 <Typography variant="body2" color={colors.blueAccent[500]}>
                                     {openIndex === discussionIndex ? 'Nascondi commenti' : 'Mostra commenti'}
                                 </Typography>
                                 <IconButton>
-                                    <ExpandMoreIcon
-                                        sx={{
-                                            transform: openIndex === discussionIndex ? 'rotate(180deg)' : 'rotate(0deg)',
-                                            transition: 'transform 0.3s ease'
-                                        }}
-                                    />
+                                    <ExpandMoreIcon sx={{ transform: openIndex === discussionIndex ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }} />
                                 </IconButton>
                             </Box>
 
@@ -196,42 +148,17 @@ const DiscussionPage = () => {
                                             <Typography variant="body2" color={colors.grey[500]}>
                                                 {comment.text}
                                             </Typography>
-                                            <IconButton
-                                                onClick={() => handleDeleteComment(discussionIndex, comment.id)}
-                                                color="error"
-                                                sx={{ ml: 1 }}
-                                            >
-                                                <DeleteIcon />
-                                            </IconButton>
                                         </Box>
                                     ))}
                                 </Box>
                             </Collapse>
 
-                            <Box
-                                display="flex"
-                                justifyContent="space-between"
-                                alignItems="center"
-                                mt={2}
-                            >
-                                <Button
-                                    variant="outlined"
-                                    color="primary"
-                                    onClick={() => {
-                                        setSelectedDiscussionIndex(discussionIndex);
-                                        setOpenCommentDialog(true);
-                                    }}
-                                >
+                            <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
+                                <Button variant="outlined" color="primary" onClick={() => {
+                                    setSelectedDiscussionIndex(discussionIndex);
+                                    handleAddComment(); // Controlla login prima di aprire il dialogo
+                                }}>
                                     Aggiungi commento
-                                </Button>
-
-                                {/* Sostituito IconButton con Button */}
-                                <Button
-                                    variant="outlined"
-                                    color="error"
-                                    onClick={() => handleDeleteDiscussion(discussionIndex)}
-                                >
-                                    Elimina discussione
                                 </Button>
                             </Box>
                         </CardContent>
@@ -239,77 +166,48 @@ const DiscussionPage = () => {
                 ))}
             </Box>
 
-            {/* Bottone per aggiungere una nuova discussione */}
-            <Box
-                position="fixed"
-                bottom={16}
-                right={16}
-                sx={{ zIndex: 10 }}
-            >
-                <IconButton
-                    color="primary"
-                    onClick={() => setOpenDialog(true)}
-                    sx={{
-                        backgroundColor: colors.blueAccent[500],
-                        "&:hover": { backgroundColor: colors.blueAccent[700] },
-                        borderRadius: "50%",
-                        padding: 2
-                    }}
-                >
+            <Box position="fixed" bottom={16} right={16} sx={{ zIndex: 10 }}>
+                <IconButton color="primary" onClick={() => setOpenDialog(true)} sx={{ backgroundColor: colors.blueAccent[500], "&:hover": { backgroundColor: colors.blueAccent[700] }, borderRadius: "50%", padding: 2 }}>
                     <AddIcon sx={{ color: "white" }} />
                 </IconButton>
             </Box>
 
-            {/* Dialog per aggiungere una nuova discussione */}
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
                 <DialogTitle>Aggiungi una nuova discussione</DialogTitle>
                 <DialogContent>
-                    <TextField
-                        label="Descrizione"
-                        multiline
-                        rows={4}
-                        fullWidth
-                        value={newDiscussionText}
-                        onChange={(e) => setNewDiscussionText(e.target.value)}
-                    />
+                    <TextField label="Descrizione" multiline rows={4} fullWidth value={newDiscussionText} onChange={(e) => setNewDiscussionText(e.target.value)} />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpenDialog(false)} color="primary">
-                        Annulla
-                    </Button>
-                    <Button onClick={handleAddDiscussion} color="primary">
-                        Aggiungi
-                    </Button>
+                    <Button onClick={() => setOpenDialog(false)} color="primary">Annulla</Button>
+                    <Button onClick={handleAddDiscussion} color="primary">Aggiungi</Button>
                 </DialogActions>
             </Dialog>
 
-            {/* Dialog per aggiungere un commento */}
-            <Dialog open={openCommentDialog} onClose={() => setOpenCommentDialog(false)}>
-                <DialogTitle>Aggiungi un commento</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        label="Commento"
-                        multiline
-                        rows={4}
-                        fullWidth
-                        value={newCommentText}
-                        onChange={(e) => setNewCommentText(e.target.value)}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenCommentDialog(false)} color="primary">
-                        Annulla
-                    </Button>
-                    <Button onClick={handleAddComment} color="primary">
-                        Aggiungi
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={3000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }} // Posizione al centro
+                sx={{
+                    position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: 9999,
+                }}
+            >
+                <Alert severity="warning">Per commentare bisogna essere loggati!</Alert>
+            </Snackbar>
         </Container>
     );
 };
 
 export default DiscussionPage;
+
+
+
+
+
 
 
 

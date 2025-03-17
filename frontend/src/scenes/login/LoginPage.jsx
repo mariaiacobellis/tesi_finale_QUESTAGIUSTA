@@ -25,7 +25,9 @@ const LoginPage = () => {
             localStorage.setItem('username', username);
 
             // Se c'è una pagina precedente salvata, reindirizza lì. Altrimenti, vai alla home
-            const redirectPath = location.state?.from || "/"; // Default alla home
+            const redirectPath = localStorage.getItem('redirectAfterLogin') || "/"; // Se non c'è, vai alla home
+            localStorage.removeItem('redirectAfterLogin'); // Rimuove il percorso di reindirizzamento
+
             navigate(redirectPath);
         } catch (error) {
             setError("Email o password non validi");
