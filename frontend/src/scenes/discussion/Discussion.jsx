@@ -43,7 +43,7 @@ const DiscussionPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    useEffect(() => {
+    {/*useEffect(() => {
         const fetchDataset = async () => {
             try {
                 const response = await axios.get(`http://localhost:5000/datasets/get/${id}`);
@@ -53,7 +53,7 @@ const DiscussionPage = () => {
             }
         };
         fetchDataset();
-    }, [id]);
+    }, [id]); */}
 
     const handleToggle = (index) => {
         setOpenIndex(openIndex === index ? null : index);
@@ -107,7 +107,7 @@ const DiscussionPage = () => {
         <Container maxWidth="md" sx={{ mt: 4, pb: 4 }}>
             <Header title="Discussioni" subtitle="Partecipa alle discussioni e lascia i tuoi commenti" />
 
-            {dataset && (
+            {/*  {dataset && (
                 <Box mb={4} p={2} sx={{ backgroundColor: colors.primary[300], borderRadius: 2 }}>
                     <Typography variant="h6" fontWeight="bold">
                         Commenti per: {dataset?.title}
@@ -116,7 +116,7 @@ const DiscussionPage = () => {
                         Qui puoi votare e commentare il dataset "{dataset?.title}".
                     </Typography>
                 </Box>
-            )}
+            )} */}
 
             <Box display="flex" flexDirection="column" gap={2}>
                 {discussionsState.map((discussion, discussionIndex) => (
