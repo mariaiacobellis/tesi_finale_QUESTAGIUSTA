@@ -58,11 +58,13 @@ const DatasetVoteComment = () => {
 
     const handleCommentSubmit = async () => {
         if (!isLoggedIn) {
-            // Se l'utente non è loggato, mostra la Snackbar
             setOpenSnackbar(true);  // Abilita la Snackbar
-            // Salva la pagina attuale per il reindirizzamento
-            localStorage.setItem("redirectAfterLogin", location.pathname);
-            navigate("/login"); // Vai alla pagina di login
+
+            setTimeout(() => {
+                localStorage.setItem("redirectAfterLogin", location.pathname);
+                navigate("/login"); // Vai alla pagina di login
+            }, 2000); // Attendi 2 secondi prima di reindirizzare
+
             return;
         }
 
