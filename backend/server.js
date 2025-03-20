@@ -6,11 +6,13 @@ import cors from "cors"; // sistema di sicurezza
 
 import auth from "./routes/auth.js";
 import datasets from "./routes/datasets.js";
+import comments from "./routes/comments.js";
 
 import multer from "multer";
 import * as path from "node:path";
 import {fileURLToPath} from "url";
 import * as fs from "node:fs";
+import discussions from "./routes/discussions.js";
 
 
 
@@ -114,15 +116,16 @@ db.connect((err) => {
                 console.log("Tabella 'dataset' pronta!");
             });
 
-            {/*Creazione della tabella commenti
+            //Creazione della tabella commenti
             const createCommentsTable = `
                 CREATE TABLE IF NOT EXISTS comments (
                     id INT AUTO_INCREMENT PRIMARY KEY,
-                    discussion_id INT NOT NULL,
+                    riferimento_id INT NOT NULL,
+                    riferimento_tipo TEXT NOT NULL,
                     username VARCHAR(255) NOT NULL,
                     comment TEXT NOT NULL,
-                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (discussion_id) REFERENCES datasets(id) ON DELETE CASCADE
+                    rating FLOAT, 
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             `;
             dbWithDB.query(createCommentsTable, (err, result) => {
@@ -131,10 +134,31 @@ db.connect((err) => {
                     return;
                 }
                 console.log("Tabella 'comments' pronta!");
-            });*/}
+            });
+
+            const createDiscussionsTable = `
+                CREATE TABLE IF NOT EXISTS discussions (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    titolo TEXT NOT NULL,
+                    username VARCHAR(255) NOT NULL,
+                    text_discussion TEXT NOT NULL,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            `;
+            dbWithDB.query(createDiscussionsTable, (err, result) => {
+                if (err) {
+                    console.error("Errore nella creazione della tabella discussions:", err);
+                    return;
+                }
+                console.log("Tabella 'discussions' pronta!");
+            });
+
         });
     });
 });
+
+
+
 const upload=multer({dest:'uploads/'})
 // Iniettiamo la connessione al db nelle richieste
 app.use((req, res, next) => {
@@ -187,6 +211,7 @@ app.get('/image/:id',(req,res)=>{
 })
 app.use("/auth", auth);
 app.use("/datasets", datasets);
-//app.use("/comments", comments); // Aggiungi il router dei commenti
+app.use("/comments", comments);
+app.use("/discussions", discussions)
 
 app.listen(5000, () => console.log("Server avviato su http://localhost:5000"));

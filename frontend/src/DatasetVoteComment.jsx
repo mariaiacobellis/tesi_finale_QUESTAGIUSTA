@@ -1,35 +1,34 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { Box, Typography, Button, Paper, TextField, useTheme, Rating, Snackbar, Alert } from "@mui/material";
-import { tokens } from "../src/theme"; // Importa i tuoi colori definiti nel tema
+import { Box, Typography, Button, Paper, TextField, useTheme, Rating, Snackbar, Alert, IconButton, Menu, MenuItem } from "@mui/material";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { tokens } from "../src/theme";
 import axios from "axios";
 
 const DatasetVoteComment = () => {
-    const { id } = useParams(); // Usa l'ID dal parametro URL
+    const { id } = useParams();
     const [dataset, setDataset] = useState(null);
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
     const [hasCommented, setHasCommented] = useState(false);
-    const [rating, setRating] = useState(0); // Stato per gestire il voto con le stelline
+    const [rating, setRating] = useState(0);
     const theme = useTheme();
-    const colors = tokens(theme.palette.mode); // Ottieni i colori dal tema
+    const colors = tokens(theme.palette.mode);
     const navigate = useNavigate();
-    const location = useLocation(); // Per ottenere la posizione corrente
+    const location = useLocation();
 
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // Stato per verificare se l'utente è loggato
-    const [userId, setUserId] = useState(null); // ID dell'utente loggato
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userId, setUserId] = useState(null);
 
-    // Stato per gestire la Snackbar
-    const [openSnackbar, setOpenSnackbar] = useState(false); // Stato per mostrare la Snackbar
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const handleCloseSnackbar = () => setOpenSnackbar(false);
 
-    const handleCloseSnackbar = () => {
-        setOpenSnackbar(false); // Chiudi la Snackbar
-    };
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [selectedCommentId, setSelectedCommentId] = useState(null);
 
     useEffect(() => {
-        // Controlla se l'utente è loggato
         const checkLoginStatus = () => {
-            const loggedInUser = localStorage.getItem("userId");
+            const loggedInUser = localStorage.getItem("username");
             if (loggedInUser) {
                 setIsLoggedIn(true);
                 setUserId(loggedInUser);
@@ -43,10 +42,10 @@ const DatasetVoteComment = () => {
                 const datasetResponse = await axios.get(`http://localhost:5000/datasets/get/${id}`);
                 setDataset(datasetResponse.data);
 
-                const commentsResponse = await axios.get(`http://localhost:5000/comments/${id}`);
+                const commentsResponse = await axios.get(`http://localhost:5000/comments/ref/${id}`);
                 setComments(commentsResponse.data);
 
-                const userCommented = commentsResponse.data.some(comment => comment.userId === userId);
+                const userCommented = commentsResponse.data.some(comment => comment.username === userId);
                 setHasCommented(userCommented);
             } catch (error) {
                 console.error("Errore nel caricamento del dataset o dei commenti:", error);
@@ -58,22 +57,21 @@ const DatasetVoteComment = () => {
 
     const handleCommentSubmit = async () => {
         if (!isLoggedIn) {
-            setOpenSnackbar(true);  // Abilita la Snackbar
-
+            setOpenSnackbar(true);
             setTimeout(() => {
                 localStorage.setItem("redirectAfterLogin", location.pathname);
-                navigate("/login"); // Vai alla pagina di login
-            }, 2000); // Attendi 2 secondi prima di reindirizzare
-
+                navigate("/login");
+            }, 2000);
             return;
         }
 
         if (newComment.trim()) {
             try {
-                const response = await axios.post(`http://localhost:5000/comments/add`, {
-                    datasetId: id,
+                const response = await axios.post(`http://localhost:5000/comments`, {
+                    riferimento_id: id,
+                    riferimento_tipo: "dataset",
+                    username: userId,
                     comment: newComment,
-                    userId: userId,
                     rating: rating,
                 });
                 setComments([response.data, ...comments]);
@@ -86,7 +84,6 @@ const DatasetVoteComment = () => {
     };
 
     useEffect(() => {
-        // Dopo il login, reindirizza l'utente alla pagina precedente (se disponibile)
         if (isLoggedIn) {
             const redirectTo = localStorage.getItem("redirectAfterLogin");
             if (redirectTo) {
@@ -95,6 +92,26 @@ const DatasetVoteComment = () => {
             }
         }
     }, [isLoggedIn, navigate]);
+
+    const handleMenuOpen = (event, commentId) => {
+        setAnchorEl(event.currentTarget);
+        setSelectedCommentId(commentId);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+        setSelectedCommentId(null);
+    };
+
+    const handleDeleteComment = async () => {
+        try {
+            await axios.delete(`http://localhost:5000/comments/${selectedCommentId}`);
+            setComments(comments.filter(comment => comment.id !== selectedCommentId));
+            handleMenuClose();
+        } catch (error) {
+            console.error("Errore nell'eliminazione del commento:", error);
+        }
+    };
 
     return (
         <Box p={3} sx={{ width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
@@ -115,15 +132,11 @@ const DatasetVoteComment = () => {
                         variant="outlined"
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
-                        disabled={hasCommented} // Disabilita se l'utente ha già commentato
+                        disabled={hasCommented}
                         sx={{
                             mt: 2,
-                            input: {
-                                color: colors.grey[100],
-                            },
-                            label: {
-                                color: colors.grey[100],
-                            },
+                            input: { color: colors.grey[100] },
+                            label: { color: colors.grey[100] },
                         }}
                     />
                     <Box mt={2}>
@@ -134,7 +147,7 @@ const DatasetVoteComment = () => {
                             name="rating"
                             value={rating}
                             onChange={(event, newValue) => setRating(newValue)}
-                            disabled={hasCommented} // Disabilita se l'utente ha già commentato
+                            disabled={hasCommented}
                         />
                     </Box>
                     <Button
@@ -151,12 +164,21 @@ const DatasetVoteComment = () => {
 
             <Box mt={3}>
                 {comments.length > 0 ? (
-                    comments.map((comment, index) => (
-                        <Box key={index} mb={2}>
+                    comments.map((comment) => (
+                        <Box key={comment.id} mb={2} sx={{ position: "relative", ":hover .comment-menu": { display: "block" } }}>
                             <Typography variant="body2" color={colors.grey[100]}>
                                 {comment.comment}
                             </Typography>
-                            <Rating value={comment.rating} readOnly /> {/* Mostra il voto */}
+                            <Rating value={comment.rating} readOnly />
+
+                            {/* Mostra il menu solo se l'utente è il proprietario del commento */}
+                            {comment.username === userId && (
+                                <Box className="comment-menu" sx={{ position: "absolute", top: 0, right: 0, display: "none" }}>
+                                    <IconButton onClick={(e) => handleMenuOpen(e, comment.id)} sx={{ color: colors.grey[100] }}>
+                                        <MoreVertIcon />
+                                    </IconButton>
+                                </Box>
+                            )}
                         </Box>
                     ))
                 ) : (
@@ -166,20 +188,11 @@ const DatasetVoteComment = () => {
                 )}
             </Box>
 
-            {/* Snackbar per avvisare l'utente che deve effettuare il login */}
-            <Snackbar
-                open={openSnackbar}
-                autoHideDuration={3000}
-                onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }} // Posizione al centro
-                sx={{
-                    position: 'fixed',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    zIndex: 9999,
-                }}
-            >
+            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+                <MenuItem onClick={handleDeleteComment}>Elimina commento</MenuItem>
+            </Menu>
+
+            <Snackbar open={openSnackbar} autoHideDuration={3000} onClose={handleCloseSnackbar}>
                 <Alert severity="warning">
                     Per aggiungere un commento devi effettuare il login
                 </Alert>
@@ -189,6 +202,7 @@ const DatasetVoteComment = () => {
 };
 
 export default DatasetVoteComment;
+
 
 
 

@@ -1,208 +1,169 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Box, Card, CardContent, Typography, IconButton, Collapse, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Button, Snackbar, Alert } from '@mui/material';
+import {
+    Container, Box, Card, CardContent, Typography, IconButton, Collapse, TextField, Dialog,
+    DialogActions, DialogContent, DialogTitle, Button, Snackbar, Alert, Fab, Menu, MenuItem
+} from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { tokens } from '../../theme';
 import Header from '../../components/Header';
-import { ExpandMore as ExpandMoreIcon, Comment as CommentIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { ExpandMore as ExpandMoreIcon, Comment as CommentIcon, Add as AddIcon, MoreVert as MoreVertIcon } from '@mui/icons-material';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-
-const discussions = [
-    {
-        title: 'Caricamento più rapido dei dataset',
-        description: 'Potreste ottimizzare il tempo di caricamento dei dataset, magari introducendo caricamenti asincroni, paginazione o caricamento "lazy" dei dati per migliorare l’esperienza utente.',
-        comments: [
-            { id: 1, text: 'Sì, anche io ho notato che a volte ci vuole un po\' di tempo per caricare i dataset. Penso che un sistema di caricamento asincrono potrebbe davvero aiutare!' },
-            { id: 2, text: 'Concordo! Un caricamento più veloce sarebbe fantastico. Magari una funzione di paginazione o il caricamento lazy potrebbero essere utili per migliorare la velocità.' }
-        ]
-    },
-    {
-        title: 'Aggiunta delle notifiche',
-        description: 'Ci vorrebbe un sistema di notifiche per quando un dataset viene approvato o quando ci sono aggiornamenti.',
-        comments: [
-            { id: 1, text: 'Anche io lo penso! Sarebbe fantastico ricevere notifiche quando un dataset che abbiamo caricato viene approvato o aggiornato.' },
-            { id: 2, text: 'Assolutamente! Inoltre, un sistema di notifiche sarebbe utile anche per gli aggiornamenti sui dataset che seguiamo, così da rimanere sempre informati.' }
-        ]
-    }
-];
 
 const DiscussionPage = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [openIndex, setOpenIndex] = useState(null);
-    const { id } = useParams();
-    const [dataset, setDataset] = useState();
-    const [discussionsState, setDiscussionsState] = useState(discussions);
+    const [discussions, setDiscussions] = useState([]);
+    const [comments, setComments] = useState({});
     const [openDialog, setOpenDialog] = useState(false);
+    const [newDiscussionTitle, setNewDiscussionTitle] = useState('');
     const [newDiscussionText, setNewDiscussionText] = useState('');
-    const [openCommentDialog, setOpenCommentDialog] = useState(false);
-    const [selectedDiscussionIndex, setSelectedDiscussionIndex] = useState(null);
-    const [newCommentText, setNewCommentText] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [newCommentText, setNewCommentText] = useState('');
+    const [selectedDiscussionId, setSelectedDiscussionId] = useState(null);
+    const [menuAnchor, setMenuAnchor] = useState(null);
+    const [selectedDiscussion, setSelectedDiscussion] = useState(null);
 
     const navigate = useNavigate();
     const location = useLocation();
+    const username = localStorage.getItem('username');
 
-    {/*useEffect(() => {
-        const fetchDataset = async () => {
-            try {
-                const response = await axios.get(`http://localhost:5000/datasets/get/${id}`);
-                if (response.data.datasets) setDataset(response.data.datasets);
-            } catch (error) {
-                console.error('Errore nel fetch del dataset:', error);
-            }
-        };
-        fetchDataset();
-    }, [id]); */}
+    useEffect(() => {
+        axios.get('http://localhost:5000/discussions')
+            .then(response => setDiscussions(response.data))
+            .catch(error => console.error("Errore nel recupero discussioni:", error));
+    }, []);
 
-    const handleToggle = (index) => {
-        setOpenIndex(openIndex === index ? null : index);
+    const fetchComments = (discussionId) => {
+        axios.get(`http://localhost:5000/comments/ref/${discussionId}`)
+            .then(response => setComments(prev => ({ ...prev, [discussionId]: response.data })))
+            .catch(error => console.error("Errore nel recupero commenti:", error));
+    };
+
+    const handleToggle = (discussionId) => {
+        if (openIndex === discussionId) {
+            setOpenIndex(null);
+        } else {
+            setOpenIndex(discussionId);
+            fetchComments(discussionId);
+        }
     };
 
     const handleAddDiscussion = () => {
-        const isLoggedIn = localStorage.getItem('username');
-
-        if (!isLoggedIn) {
-            setSnackbarOpen(true); // Mostra il banner
+        if (!username) {
+            setSnackbarOpen(true);
             return;
         }
 
-        if (newDiscussionText.trim()) {
-            setDiscussionsState([{ title: 'Nuova Discussione', description: newDiscussionText, comments: [] }, ...discussionsState]);
-            setOpenDialog(false);
-            setNewDiscussionText('');
+        if (newDiscussionTitle.trim() && newDiscussionText.trim()) {
+            axios.post('http://localhost:5000/discussions', {
+                titolo: newDiscussionTitle,
+                username,
+                text_discussion: newDiscussionText
+            }).then(response => {
+                setDiscussions([response.data, ...discussions]);
+                setOpenDialog(false);
+                setNewDiscussionTitle('');
+                setNewDiscussionText('');
+            }).catch(error => console.error("Errore nell'aggiunta discussione:", error));
         }
     };
 
     const handleAddComment = () => {
-        const isLoggedIn = localStorage.getItem('username');
-
-        if (!isLoggedIn) {
-            setSnackbarOpen(true); // Mostra il banner
+        if (!username) {
+            setSnackbarOpen(true);
             return;
         }
 
         if (newCommentText.trim()) {
-            const updatedDiscussions = discussionsState.map((discussion, index) => {
-                if (index === selectedDiscussionIndex) {
-                    return { ...discussion, comments: [...discussion.comments, { id: discussion.comments.length + 1, text: newCommentText }] };
-                }
-                return discussion;
-            });
-
-            setDiscussionsState(updatedDiscussions);
-            setOpenCommentDialog(false);
-            setNewCommentText('');
+            axios.post('http://localhost:5000/comments', {
+                discussion_id: selectedDiscussionId,
+                username,
+                text: newCommentText
+            }).then(response => {
+                setComments(prev => ({
+                    ...prev,
+                    [selectedDiscussionId]: [...(prev[selectedDiscussionId] || []), response.data]
+                }));
+                setNewCommentText('');
+            }).catch(error => console.error("Errore nell'aggiunta commento:", error));
         }
     };
 
     const handleCloseSnackbar = () => {
-        // Salva la pagina corrente nel localStorage
         localStorage.setItem('redirectAfterLogin', location.pathname);
         setSnackbarOpen(false);
-        navigate('/login'); // Reindirizza alla pagina di login
+        navigate('/login');
     };
 
     return (
         <Container maxWidth="md" sx={{ mt: 4, pb: 4 }}>
             <Header title="Discussioni" subtitle="Partecipa alle discussioni e lascia i tuoi commenti" />
 
-            {/*  {dataset && (
-                <Box mb={4} p={2} sx={{ backgroundColor: colors.primary[300], borderRadius: 2 }}>
-                    <Typography variant="h6" fontWeight="bold">
-                        Commenti per: {dataset?.title}
-                    </Typography>
-                    <Typography variant="body2" color={colors.grey[600]}>
-                        Qui puoi votare e commentare il dataset "{dataset?.title}".
-                    </Typography>
-                </Box>
-            )} */}
-
             <Box display="flex" flexDirection="column" gap={2}>
-                {discussionsState.map((discussion, discussionIndex) => (
-                    <Card key={discussionIndex} sx={{ backgroundColor: colors.primary[400], boxShadow: 3, borderRadius: 2, mb: discussionIndex === discussionsState.length - 1 ? 4 : 0 }}>
+                {discussions.map((discussion) => (
+                    <Card key={discussion.id} sx={{ backgroundColor: colors.primary[400], boxShadow: 3, borderRadius: 2, position: 'relative' }}>
                         <CardContent>
-                            <Box display="flex" flexDirection="column" mb={2} sx={{ cursor: 'pointer' }}>
-                                <Typography variant="h6" fontWeight="bold">
-                                    {discussion.title}
-                                </Typography>
+                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                                <Typography variant="h6" fontWeight="bold">{discussion.titolo}</Typography>
+                                {discussion.username === username && (
+                                    <IconButton
+                                        onClick={(e) => {
+                                            setMenuAnchor(e.currentTarget);
+                                            setSelectedDiscussion(discussion);
+                                        }}
+                                        onMouseEnter={(e) => setMenuAnchor(e.currentTarget)}
+                                        onMouseLeave={() => setMenuAnchor(null)}
+                                    >
+                                        <MoreVertIcon />
+                                    </IconButton>
+                                )}
                             </Box>
-                            <Typography variant="body2" color={colors.grey[600]}>
-                                {discussion.description}
-                            </Typography>
+                            <Typography variant="body2" color={colors.grey[600]}>{discussion.text_discussion}</Typography>
 
-                            <Box display="flex" justifyContent="space-between" alignItems="center" onClick={() => handleToggle(discussionIndex)}>
+                            <Box display="flex" justifyContent="space-between" alignItems="center" onClick={() => handleToggle(discussion.id)}>
                                 <Typography variant="body2" color={colors.blueAccent[500]}>
-                                    {openIndex === discussionIndex ? 'Nascondi commenti' : 'Mostra commenti'}
+                                    {openIndex === discussion.id ? 'Nascondi commenti' : 'Mostra commenti'}
                                 </Typography>
-                                <IconButton>
-                                    <ExpandMoreIcon sx={{ transform: openIndex === discussionIndex ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }} />
-                                </IconButton>
+                                <ExpandMoreIcon sx={{ transform: openIndex === discussion.id ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }} />
                             </Box>
 
-                            <Collapse in={openIndex === discussionIndex}>
-                                <Box mt={2} display="flex" flexDirection="column" gap={1}>
-                                    {discussion.comments.map((comment) => (
-                                        <Box key={comment.id} display="flex" alignItems="center" gap={1}>
-                                            <CommentIcon sx={{ color: colors.greenAccent[500] }} />
-                                            <Typography variant="body2" color={colors.grey[500]}>
-                                                {comment.text}
-                                            </Typography>
-                                        </Box>
+                            <Collapse in={openIndex === discussion.id}>
+                                <Box mt={2}>
+                                    {(comments[discussion.id] || []).map((comment) => (
+                                        <Typography key={comment.id} variant="body2" color={colors.grey[500]}>
+                                            <CommentIcon sx={{ color: colors.greenAccent[500], mr: 1 }} />
+                                            {comment.comment}
+                                        </Typography>
                                     ))}
                                 </Box>
+                                <Box mt={2}>
+                                    <TextField
+                                        label="Aggiungi un commento"
+                                        fullWidth
+                                        value={newCommentText}
+                                        onChange={(e) => setNewCommentText(e.target.value)}
+                                    />
+                                    <Button variant="contained" color="primary" onClick={() => { setSelectedDiscussionId(discussion.id); handleAddComment(); }} sx={{ mt: 1 }}>
+                                        Invia
+                                    </Button>
+                                </Box>
                             </Collapse>
-
-                            <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
-                                <Button variant="outlined" color="primary" onClick={() => {
-                                    setSelectedDiscussionIndex(discussionIndex);
-                                    handleAddComment(); // Controlla login prima di aprire il dialogo
-                                }}>
-                                    Aggiungi commento
-                                </Button>
-                            </Box>
                         </CardContent>
                     </Card>
                 ))}
             </Box>
-
-            <Box position="fixed" bottom={16} right={16} sx={{ zIndex: 10 }}>
-                <IconButton color="primary" onClick={() => setOpenDialog(true)} sx={{ backgroundColor: colors.blueAccent[500], "&:hover": { backgroundColor: colors.blueAccent[700] }, borderRadius: "50%", padding: 2 }}>
-                    <AddIcon sx={{ color: "white" }} />
-                </IconButton>
-            </Box>
-
-            <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-                <DialogTitle>Aggiungi una nuova discussione</DialogTitle>
-                <DialogContent>
-                    <TextField label="Descrizione" multiline rows={4} fullWidth value={newDiscussionText} onChange={(e) => setNewDiscussionText(e.target.value)} />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenDialog(false)} color="primary">Annulla</Button>
-                    <Button onClick={handleAddDiscussion} color="primary">Aggiungi</Button>
-                </DialogActions>
-            </Dialog>
-
-            <Snackbar
-                open={snackbarOpen}
-                autoHideDuration={3000}
-                onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }} // Posizione al centro
-                sx={{
-                    position: 'fixed',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    zIndex: 9999,
-                }}
-            >
-                <Alert severity="warning">Per commentare bisogna essere loggati!</Alert>
-            </Snackbar>
         </Container>
     );
 };
 
 export default DiscussionPage;
+
+
+
+
+
 
 
 
