@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { Box, Typography, Button, Paper, TextField, useTheme, Rating, Snackbar, Alert, IconButton, Menu, MenuItem } from "@mui/material";
+import { Box, Typography, Button, Paper, TextField, useTheme, Rating, Snackbar, Alert, IconButton, Menu, MenuItem, Card, CardContent, CardActions } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { tokens } from "../src/theme";
 import axios from "axios";
@@ -165,21 +165,25 @@ const DatasetVoteComment = () => {
             <Box mt={3}>
                 {comments.length > 0 ? (
                     comments.map((comment) => (
-                        <Box key={comment.id} mb={2} sx={{ position: "relative", ":hover .comment-menu": { display: "block" } }}>
-                            <Typography variant="body2" color={colors.grey[100]}>
-                                {comment.comment}
-                            </Typography>
-                            <Rating value={comment.rating} readOnly />
+                        <Card key={comment.id} sx={{ mb: 2, backgroundColor: colors.primary[400] }}>
+                            <CardContent>
+                                <Typography variant="h6" color={colors.blueAccent[500]}>
+                                    {comment.username}
+                                </Typography>
+                                <Typography variant="body2" color={colors.grey[100]}>
+                                    {comment.comment}
+                                </Typography>
+                                <Rating value={comment.rating} readOnly />
+                            </CardContent>
 
-                            {/* Mostra il menu solo se l'utente è il proprietario del commento */}
                             {comment.username === userId && (
-                                <Box className="comment-menu" sx={{ position: "absolute", top: 0, right: 0, display: "none" }}>
+                                <CardActions sx={{ justifyContent: "flex-end" }}>
                                     <IconButton onClick={(e) => handleMenuOpen(e, comment.id)} sx={{ color: colors.grey[100] }}>
                                         <MoreVertIcon />
                                     </IconButton>
-                                </Box>
+                                </CardActions>
                             )}
-                        </Box>
+                        </Card>
                     ))
                 ) : (
                     <Typography variant="body1" color={colors.grey[100]}>
@@ -202,6 +206,7 @@ const DatasetVoteComment = () => {
 };
 
 export default DatasetVoteComment;
+
 
 
 

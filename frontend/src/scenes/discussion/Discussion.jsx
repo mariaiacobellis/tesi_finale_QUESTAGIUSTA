@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import {
-    Container, Box, Card, CardContent, Typography, IconButton, Collapse, TextField, Dialog,
-    DialogActions, DialogContent, DialogTitle, Button, Snackbar, Alert, Fab, Menu, MenuItem
+    Container, Box, Card, CardContent, Typography, IconButton, Collapse, TextField, Button, Snackbar, Alert, Fab, Dialog, DialogActions, DialogContent, DialogTitle
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { tokens } from '../../theme';
 import Header from '../../components/Header';
-import { ExpandMore as ExpandMoreIcon, Comment as CommentIcon, Add as AddIcon, MoreVert as MoreVertIcon } from '@mui/icons-material';
+import { ExpandMore as ExpandMoreIcon, Comment as CommentIcon, MoreVert as MoreVertIcon, Add as AddIcon } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 
@@ -16,14 +15,12 @@ const DiscussionPage = () => {
     const [openIndex, setOpenIndex] = useState(null);
     const [discussions, setDiscussions] = useState([]);
     const [comments, setComments] = useState({});
-    const [openDialog, setOpenDialog] = useState(false);
     const [newDiscussionTitle, setNewDiscussionTitle] = useState('');
     const [newDiscussionText, setNewDiscussionText] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [newCommentText, setNewCommentText] = useState('');
     const [selectedDiscussionId, setSelectedDiscussionId] = useState(null);
-    const [menuAnchor, setMenuAnchor] = useState(null);
-    const [selectedDiscussion, setSelectedDiscussion] = useState(null);
+    const [openDialog, setOpenDialog] = useState(false);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -109,18 +106,16 @@ const DiscussionPage = () => {
                                 <Typography variant="h6" fontWeight="bold">{discussion.titolo}</Typography>
                                 {discussion.username === username && (
                                     <IconButton
-                                        onClick={(e) => {
-                                            setMenuAnchor(e.currentTarget);
-                                            setSelectedDiscussion(discussion);
+                                        onClick={() => {
+                                            setSelectedDiscussionId(discussion.id);
+                                            handleToggle(discussion.id);
                                         }}
-                                        onMouseEnter={(e) => setMenuAnchor(e.currentTarget)}
-                                        onMouseLeave={() => setMenuAnchor(null)}
                                     >
                                         <MoreVertIcon />
                                     </IconButton>
                                 )}
                             </Box>
-                            <Typography variant="body2" color={colors.grey[600]}>{discussion.text_discussion}</Typography>
+                            <Typography variant="body2" color={colors.grey[400]}>{discussion.text_discussion}</Typography>
 
                             <Box display="flex" justifyContent="space-between" alignItems="center" onClick={() => handleToggle(discussion.id)}>
                                 <Typography variant="body2" color={colors.blueAccent[500]}>
@@ -145,7 +140,7 @@ const DiscussionPage = () => {
                                         value={newCommentText}
                                         onChange={(e) => setNewCommentText(e.target.value)}
                                     />
-                                    <Button variant="contained" color="primary" onClick={() => { setSelectedDiscussionId(discussion.id); handleAddComment(); }} sx={{ mt: 1 }}>
+                                    <Button variant="contained" color="primary" onClick={handleAddComment} sx={{ mt: 1 }}>
                                         Invia
                                     </Button>
                                 </Box>
@@ -154,11 +149,62 @@ const DiscussionPage = () => {
                     </Card>
                 ))}
             </Box>
+
+            {/* Bottone per aggiungere una nuova discussione */}
+            <Fab
+                sx={{
+                    position: 'fixed',
+                    bottom: 16,
+                    right: 16,
+                    backgroundColor: colors.greenAccent[500], // Cambia il colore qui
+                    '&:hover': {
+                        backgroundColor: colors.greenAccent[700], // Cambia anche il colore al passaggio del mouse, se necessario
+                    },
+                }}
+                aria-label="add"
+                onClick={() => setOpenDialog(true)}
+            >
+                <AddIcon />
+            </Fab>
+
+            {/* Dialogo per aggiungere una nuova discussione */}
+            <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+                <DialogTitle>Aggiungi una nuova discussione</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        label="Titolo"
+                        fullWidth
+                        value={newDiscussionTitle}
+                        onChange={(e) => setNewDiscussionTitle(e.target.value)}
+                        sx={{ mb: 2, backgroundColor: colors.primary[400] }}
+                    />
+                    <TextField
+                        label="Descrizione"
+                        fullWidth
+                        multiline
+                        rows={4}
+                        value={newDiscussionText}
+                        onChange={(e) => setNewDiscussionText(e.target.value)}
+                        sx={{ mb: 2, backgroundColor: colors.primary[400] }}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenDialog(false)} color="primary">Annulla</Button>
+                    <Button onClick={handleAddDiscussion} color="primary">Aggiungi</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+                <Alert onClose={handleCloseSnackbar} severity="warning">
+                    Devi effettuare il login per aggiungere una discussione o un commento!
+                </Alert>
+            </Snackbar>
         </Container>
     );
 };
 
 export default DiscussionPage;
+
 
 
 
