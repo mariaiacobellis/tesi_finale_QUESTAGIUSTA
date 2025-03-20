@@ -169,14 +169,34 @@ const DiscussionPage = () => {
 
             {/* Dialogo per aggiungere una nuova discussione */}
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-                <DialogTitle>Aggiungi una nuova discussione</DialogTitle>
-                <DialogContent>
+                <DialogTitle sx={{ backgroundColor: colors.primary[400], color: colors.grey[100] }}>
+                    Aggiungi una nuova discussione
+                </DialogTitle>
+                <DialogContent sx={{ backgroundColor: colors.primary[400] }}>
                     <TextField
                         label="Titolo"
                         fullWidth
                         value={newDiscussionTitle}
                         onChange={(e) => setNewDiscussionTitle(e.target.value)}
-                        sx={{ mb: 2, backgroundColor: colors.primary[400] }}
+                        sx={{
+                            mb: 2,
+                            backgroundColor: colors.primary[400],
+                            color: colors.grey[100], // Colore del testo
+                            '& .MuiInputLabel-root': {
+                                color: colors.grey[100], // Colore del label
+                            },
+                            '& .MuiOutlinedInput-root': {
+                                '& fieldset': {
+                                    borderColor: colors.grey[100], // Colore del bordo
+                                },
+                                '&:hover fieldset': {
+                                    borderColor: colors.grey[100], // Colore del bordo al passaggio del mouse
+                                },
+                                '&.Mui-focused fieldset': {
+                                    borderColor: colors.grey[100], // Colore del bordo quando è in focus
+                                },
+                            },
+                        }}
                     />
                     <TextField
                         label="Descrizione"
@@ -185,12 +205,34 @@ const DiscussionPage = () => {
                         rows={4}
                         value={newDiscussionText}
                         onChange={(e) => setNewDiscussionText(e.target.value)}
-                        sx={{ mb: 2, backgroundColor: colors.primary[400] }}
+                        sx={{
+                            mb: 2,
+                            backgroundColor: colors.primary[400],
+                            color: colors.grey[100], // Colore del testo
+                            '& .MuiInputLabel-root': {
+                                color: colors.grey[100], // Colore del label
+                            },
+                            '& .MuiOutlinedInput-root': {
+                                '& fieldset': {
+                                    borderColor: colors.grey[100], // Colore del bordo
+                                },
+                                '&:hover fieldset': {
+                                    borderColor: colors.grey[100], // Colore del bordo al passaggio del mouse
+                                },
+                                '&.Mui-focused fieldset': {
+                                    borderColor: colors.grey[100], // Colore del bordo quando è in focus
+                                },
+                            },
+                        }}
                     />
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenDialog(false)} color="primary">Annulla</Button>
-                    <Button onClick={handleAddDiscussion} color="primary">Aggiungi</Button>
+                <DialogActions sx={{ backgroundColor: colors.primary[400] }}>
+                    <Button onClick={() => setOpenDialog(false)} sx={{ color: colors.grey[100] }}>
+                        Annulla
+                    </Button>
+                    <Button onClick={handleAddDiscussion} sx={{ color: colors.grey[100] }}>
+                        Aggiungi
+                    </Button>
                 </DialogActions>
             </Dialog>
 
