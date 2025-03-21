@@ -2,18 +2,73 @@ import express from "express";
 import * as path from "node:path";
 import * as fs from "node:fs";
 import {fileURLToPath} from "url";
+import * as readline from "readline";
 const router = express.Router();
 
 
-
-const readTSVFile = (nomeFile) => {
-    console.log(nomeFile);
+// Route per servire il file
+router.get('/download/:id', (req, res) => {
+    console.log("entro");
+    const id = req.params.id;
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
-    const filePath = path.join(__dirname, "/fileDataset",nomeFile);
-    const fileContent = fs.readFileSync(filePath, 'utf-8');
-    const rows = fileContent.split('\n').map(row => row.split('\t'));
-    return rows;
+    const filePath = path.join(__dirname, 'fileDataset', id);
+    console.log(filePath);
+    // Verifica che il file esista
+    if (fs.existsSync(filePath)) {
+        // Stream del file
+        const fileStream = fs.createReadStream(filePath);
+        res.setHeader('Content-Disposition', 'attachment; filename="file-1741888336628.tsv"');
+        res.setHeader('Content-Type', 'text/tab-separated-values'); // Modifica il tipo MIME se necessario
+        fileStream.pipe(res); // Esegui lo stream del file alla risposta
+    } else {
+        res.status(404).send('File non trovato');
+    }
+});
+
+
+const readTSVFile = async (nomeFile, start,end,res) => {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const filePath = path.join(__dirname, "/fileDataset", nomeFile);
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ error: "File non trovato" });
+    }
+    const fileStream = fs.createReadStream(filePath, { encoding: 'utf-8' });
+
+    const rl = readline.createInterface({
+        input: fileStream,
+        crlfDelay: Infinity
+    });
+    let currentLine = 0;
+    let rows = [];
+    const batchSize = 20;
+
+    for await (const line of rl) {
+        currentLine++;
+        if (currentLine < start) continue; // Salta le righe prima di "start"
+        if (currentLine > end) break; // Interrompe la lettura quando raggiunge "end"
+
+        const rows_temp = line.split('\t')
+        if (rows_temp.length === 1){
+            console.log(rows_temp);
+            const rows_ok = rows_temp[0].split(',');
+            rows.push(rows_ok)
+        } else {
+            rows.push(line.split('\t'));
+        }
+
+
+
+        if (rows.length === batchSize) {
+            break
+
+
+        }
+    }
+    return rows
+
+
 };
 
 // Registrazione utente
@@ -139,19 +194,16 @@ router.get("/all/pending", (req, res) => {
     });
 });
 
-router.get("/getFile/:id", (req, res) =>{
+router.get("/getFile/:id", async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
-
     console.log(req.params.id);
-
-    const data = readTSVFile(req.params.id);
     const startIndex = (page - 1) * limit;
     const endIndex = startIndex + limit;
+    const data = await readTSVFile(req.params.id, startIndex, endIndex);
+    res.json({ data: data });  // Invia i dati come JSON
 
-    const paginatedData = data.slice(startIndex, endIndex);
 
-    res.json(paginatedData);
 } );
 
 router.put("/status/:id", (req, res) => {

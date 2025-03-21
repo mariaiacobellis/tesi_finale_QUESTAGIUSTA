@@ -14,7 +14,7 @@ import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS } from "chart.js/auto";
 
 const DatasetDetail = () => {
-    const { id } = useParams();
+    const {id} = useParams();
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [dataset, setDataset] = useState(null);
@@ -27,6 +27,33 @@ const DatasetDetail = () => {
     const [rows, setRows] = useState([]);
     const [columns, setColumns] = useState([]);
 
+
+    // Funzione per il download del file
+    const downloadFile = () => {
+        let id = dataset.storage;
+        fetch(`http://localhost:5000/datasets/download/${id}`, {
+            method: 'GET',
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Errore durante il download");
+                }
+                // Scarica il file come Blob
+                return response.blob();
+            })
+            .then((blob) => {
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob); // Crea un URL temporaneo per il file
+                link.download = dataset.storage; // Imposta il nome del file
+                link.click(); // Avvia il download
+            })
+            .catch((error) => {
+                console.error('Errore durante il download:', error);
+            });
+    };
+
+
+
     const fetchData = async () => {
         setLoading(true);
         try {
@@ -34,16 +61,16 @@ const DatasetDetail = () => {
                 params: { page, limit: 20 }, // Limit di 20 per pagina, puoi regolarlo
             });
 
-            if (response.data.length === 0) {
+            if (response.data.data.length === 0) {
                 setHasMore(false); // Se non ci sono più dati, non continuare il caricamento
             } else {
-                setRows((prevRows) => [...prevRows, ...response.data]);
+                setRows((prevRows) => [...prevRows, ...response.data.data]);
 
-                console.log(response.data[0]);
+                console.log(response.data.data[0]);
                 // Imposta dinamicamente le colonne usando i nomi della prima riga dei dati
-                const dynamicColumns = Object.keys(response.data[0]).map(key => ({
+                const dynamicColumns = Object.keys(response.data.data[0]).map(key => ({
                     id: key,
-                    label: response.data[0][key] // Formatta il nome della colonna
+                    label: response.data.data[0][key] // Formatta il nome della colonna
                 }));
                 setColumns(dynamicColumns);
 
@@ -195,7 +222,7 @@ const DatasetDetail = () => {
                         {/* Pulsante di download */}
                         {dataset?.storage && (
                             <Grid item xs={12}>
-                                <Button variant="contained" color="secondary" onClick={() => alert("Download in corso!")}>
+                                <Button variant="contained" color="secondary" onClick={() => downloadFile()}>
                                     <DownloadIcon sx={{ mr: 1 }} />
                                     Scarica Dataset
                                 </Button>
