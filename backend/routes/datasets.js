@@ -78,6 +78,21 @@ router.post("/add", async (req, res) => {
     });
 });
 
+router.get("/trending", (req, res) => {
+    const db = req.db;
+
+    const sql = "SELECT * FROM datasets WHERE status='Approved' ORDER BY rating DESC LIMIT 3";
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error("Errore nel recupero dei dataset in trending:", err);
+            return res.status(500).json({ error: "Errore nel database", details: err });
+        }
+        res.json({ datasets: results });
+    });
+});
+
+
 // Ottenere un dataset specifico
 router.get("/get/:id", (req, res) => {
     const id = req.params.id;
