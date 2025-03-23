@@ -1,18 +1,20 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Box, Button, Grid, useTheme } from "@mui/material";
+import { Box, Button, Grid, useTheme, useMediaQuery } from "@mui/material";
 import DatasetCard from "./DatasetCard";
 import { Link } from "react-router-dom";
 import { ArrowBack, ArrowForward } from "@mui/icons-material";
 import { tokens } from "../theme";
 
-const DatasetList = ({ datasets }) => {
+const DatasetList = ({ datasets, showNavigation = true }) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const containerRef = useRef(null);
     const [maxVisibleCards, setMaxVisibleCards] = useState(1);
     const [startIndex, setStartIndex] = useState(0);
 
-    // Calcola quante card possono stare in base alla larghezza del container
+    // Usa i breakpoint per determinare la larghezza del dispositivo
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Mostra uno alla volta sui dispositivi mobili
+
     useEffect(() => {
         const updateVisibleCards = () => {
             if (containerRef.current) {
@@ -28,6 +30,11 @@ const DatasetList = ({ datasets }) => {
         return () => window.removeEventListener("resize", updateVisibleCards);
     }, []);
 
+    useEffect(() => {
+        // Forza a 1 solo card sui dispositivi mobili
+        setMaxVisibleCards(isMobile ? 1 : Math.floor(containerRef.current.offsetWidth / 218));
+    }, [isMobile]);
+
     const nextCards = () => {
         if (startIndex + maxVisibleCards < datasets.length) {
             setStartIndex(startIndex + 1);
@@ -42,10 +49,14 @@ const DatasetList = ({ datasets }) => {
 
     return (
         <Box display="flex" alignItems="center" justifyContent="center" width="100%">
-            {/* Bottone SINISTRA */}
-            <Button onClick={prevCards} disabled={startIndex === 0} sx={{ minWidth: "50px" }}>
-                <ArrowBack sx={{ color: startIndex === 0 ? "gray" : colors.blueAccent[500] }} />
-            </Button>
+            {showNavigation && ( // Mostra i bottoni solo se showNavigation è true
+                <>
+                    {/* Bottone SINISTRA */}
+                    <Button onClick={prevCards} disabled={startIndex === 0} sx={{ minWidth: "50px" }}>
+                        <ArrowBack sx={{ color: startIndex === 0 ? "gray" : colors.blueAccent[500] }} />
+                    </Button>
+                </>
+            )}
 
             {/* Contenitore delle card, allineato al centro */}
             <Box
@@ -71,15 +82,21 @@ const DatasetList = ({ datasets }) => {
                 </Grid>
             </Box>
 
-            {/* Bottone DESTRA */}
-            <Button onClick={nextCards} disabled={startIndex + maxVisibleCards >= datasets.length} sx={{ minWidth: "50px" }}>
-                <ArrowForward sx={{ color: startIndex + maxVisibleCards >= datasets.length ? "gray" : colors.blueAccent[500] }} />
-            </Button>
+            {showNavigation && ( // Mostra i bottoni solo se showNavigation è true
+                <>
+                    {/* Bottone DESTRA */}
+                    <Button onClick={nextCards} disabled={startIndex + maxVisibleCards >= datasets.length} sx={{ minWidth: "50px" }}>
+                        <ArrowForward sx={{ color: startIndex + maxVisibleCards >= datasets.length ? "gray" : colors.blueAccent[500] }} />
+                    </Button>
+                </>
+            )}
         </Box>
     );
 };
 
 export default DatasetList;
+
+
 
 
 

@@ -76,7 +76,7 @@ const Datasets = () => {
                         {trendingDatasets.length > 0 ? (
                             trendingDatasets.map((dataset) => (
                                 <Grid item xs={12} sm={6} md={4} key={dataset.id || dataset.name}>
-                                    <DataList datasets={[dataset]} />
+                                    <DataList datasets={[dataset]} showNavigation={false} /> {/* Passa showNavigation={false} */}
                                 </Grid>
                             ))
                         ) : (
