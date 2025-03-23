@@ -40,7 +40,8 @@ const Add = () => {
     const [selectedField, setSelectedField] = useState("");
     const [fieldValue, setFieldValue] = useState("");
     const [addedFields, setAddedFields] = useState([]);
-    const [openSnackbar, setOpenSnackbar] = useState(false); // Stato per il Snackbar
+    const [openSnackbar, setOpenSnackbar] = useState(false); // Stato per il messaggio di login
+    const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false); // Stato per il messaggio di successo
 
     const handleAddField = () => {
         if (!selectedField || !fieldValue) return;
@@ -109,6 +110,8 @@ const Add = () => {
         try {
             const response = await axios.post("http://localhost:5000/datasets/add", dataset);
             console.log(response);
+            // Mostra il messaggio di successo
+            setOpenSuccessSnackbar(true);
         } catch (error) {
             console.error("Errore durante il caricamento del dataset:", error);
         }
@@ -116,6 +119,10 @@ const Add = () => {
 
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
+    };
+
+    const handleCloseSuccessSnackbar = () => {
+        setOpenSuccessSnackbar(false);
     };
 
     return (
@@ -238,7 +245,7 @@ const Add = () => {
                 open={openSnackbar}
                 autoHideDuration={3000}
                 onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }} // Posizione al centro
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                 sx={{
                     position: 'fixed',
                     top: '50%',
@@ -251,11 +258,31 @@ const Add = () => {
                     Per aggiungere un dataset devi effettuare il login
                 </Alert>
             </Snackbar>
+
+            {/* Snackbar per il messaggio di successo */}
+            <Snackbar
+                open={openSuccessSnackbar}
+                autoHideDuration={3000}
+                onClose={handleCloseSuccessSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                sx={{
+                    position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: 9999,
+                }}
+            >
+                <Alert severity="success">
+                    Il tuo Dataset è stato caricato correttamente, attendi l'approvazione.
+                </Alert>
+            </Snackbar>
         </Container>
     );
 };
 
 export default Add;
+
 
 
 
