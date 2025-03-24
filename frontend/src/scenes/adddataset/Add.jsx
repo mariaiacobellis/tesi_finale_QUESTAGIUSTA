@@ -43,10 +43,22 @@ const Add = () => {
     const [openSnackbar, setOpenSnackbar] = useState(false); // Stato per il messaggio di login
     const [openSuccessSnackbar, setOpenSuccessSnackbar] = useState(false); // Stato per il messaggio di successo
 
+    const [category, setCategory] = useState([]);
+    const [statistiche, setStatistiche] = useState([]);
     const handleAddField = () => {
         if (!selectedField || !fieldValue) return;
         setAddedFields([...addedFields, { key: selectedField, value: fieldValue }]);
-        setDataset({ ...dataset, [selectedField]: fieldValue });
+        //setDataset({ ...dataset, [selectedField]: fieldValue });
+        // Controlla se titolocategoria è uno dei campi numerici e aggiunge a statisticheData
+        const numericFields = ['numRatings', 'numUsers', 'numItems', 'density'];
+
+        if (numericFields.includes(selectedField)) {
+            // Se titolocategoria è uno dei campi numerici, inserisci in statisticheData
+            setStatistiche([...statistiche, { titolocategoria: selectedField, valorecategoria: parseFloat(fieldValue) }]);
+        } else {
+            // Altrimenti inserisci in categoryData
+            setCategory([...category, { titolocategoria: selectedField, valorecategoria: fieldValue }]);
+        }
         setSelectedField("");
         setFieldValue("");
     };
@@ -54,9 +66,19 @@ const Add = () => {
     const handleRemoveField = (index, key) => {
         const newFields = addedFields.filter((_, i) => i !== index);
         setAddedFields(newFields);
-        const newDataset = { ...dataset };
-        delete newDataset[key];
-        setDataset(newDataset);
+        // Verifica se l'elemento appartiene a statisticheData o categoryData
+        const itemInStatistiche = statistiche[index];
+        const itemInCategory = category[index];
+
+        if (itemInStatistiche) {
+            // Rimuove l'elemento da statisticheData
+            const newStatistiche = statistiche.filter((_, i) => i !== index);
+            setStatistiche(newStatistiche);
+        } else if (itemInCategory) {
+            // Rimuove l'elemento da categoryData
+            const newCategory = category.filter((_, i) => i !== index);
+            setCategory(newCategory);
+        }
     };
 
     const handleSubmit = async () => {
@@ -106,8 +128,12 @@ const Add = () => {
         }
 
 
-        const categoryArray = [];
-        const statisticheArray = [];
+
+        console.log(category);
+
+        console.log(statistiche);
+
+        dataset.descrizione="ciaoooo";
 
         try {
             const response = await axios.post("http://localhost:5000/datasets/add", {
@@ -121,8 +147,8 @@ const Add = () => {
                     status: "Pending",
                     username: isLoggedIn
                 },
-                categoryData: categoryArray,
-                statisticheData: statisticheArray
+                categoryData: category,
+                statisticheData: statistiche
             });
             console.log(response);
             // Mostra il messaggio di successo
