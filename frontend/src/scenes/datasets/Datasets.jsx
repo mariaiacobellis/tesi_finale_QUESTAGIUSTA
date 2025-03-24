@@ -43,6 +43,7 @@ const Datasets = () => {
                 console.log("Fetching trending datasets...");
                 const response = await axios.get('http://localhost:5000/datasets/trending');
                 console.log("Trending Datasets Response:", response.data);
+               
                 if (response.data.datasets) {
                     setTrendingDatasets(response.data.datasets);
                 } else {

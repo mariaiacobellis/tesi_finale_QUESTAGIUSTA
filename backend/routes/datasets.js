@@ -193,108 +193,69 @@ router.get("/trending", (req, res) => {
     });
 });
 
-const getDatasetById = async (req, res) => {
-    const { id } = req.params; // Ottieni l'ID del dataset dalla richiesta
-    const db = req.db;
-    const connection = await db.getConnection(); // Assicurati di avere una connessione al database
+function getDataset(id, req) {
+    return new Promise((resolve, reject) => {
+        const db = req.db; // Connessione al database
 
-    try {
-        // Query per ottenere i dati del dataset
-        const [datasetRows] = await connection.query(
-            "SELECT * FROM datasets WHERE id = ?",
-            [id]
-        );
+        db.beginTransaction((err) => {
+            if (err) {
+                return reject(err);
+            }
 
-        if (datasetRows.length === 0) {
-            return res.status(404).json({ error: "Dataset non trovato" });
-        }
+            const resultData = {}
+            const datasetQuery = `SELECT * FROM  datasets WHERE id = ?`;
 
-        const dataset = datasetRows[0];
+            db.query(datasetQuery, [id], (err, result) => {
+                if (err) {
+                    return db.rollback(() => reject(err));
+                }
+                resultData.dataset = result
 
-        // Query per ottenere i dati di categoria
-        const [categoryRows] = await connection.query(
-            "SELECT titolocategoria, valorecategoria FROM categorydatasets WHERE datasetriferimento = ?",
-            [id]
-        );
+                const categoryQuery = `SELECT titolocategoria, valorecategoria FROM categorydatasets WHERE datasetriferimento = ?`;
 
-        // Query per ottenere i dati delle statistiche
-        const [statisticheRows] = await connection.query(
-            "SELECT titolocategoria, valorecategoria FROM statistichedatasets WHERE datasetriferimento = ?",
-            [id]
-        );
+                db.query(categoryQuery, [id], (err, categoryResult) => {
+                    if (err) {
+                        return db.rollback(() => reject(err));
+                    }
+                    resultData.category = categoryResult;
 
-        // Costruisci l'output secondo il formato richiesto
-        const result = {
-            datasetData: {
-                title: dataset.title,
-                descrizione: dataset.descrizione,
-                rating: dataset.rating,
-                storage: dataset.storage,
-                category: dataset.category,
-                img: dataset.img,
-                status: dataset.status, // Se status è null, metti "Pending"
-                username: dataset.username,
-            },
-            categoryData: categoryRows, // Array di categorie associate
-            statisticheData: statisticheRows // Array di statistiche associate
-        };
+                    const statisticheQuery = `SELECT titolocategoria, valorecategoria FROM statistichedatasets WHERE datasetriferimento = ?`;
 
-        res.json(result);
-    } catch (error) {
-        console.error("Errore nel recupero del dataset:", error);
-        res.status(500).json({ error: "Errore del server" });
-    } finally {
-        connection.release(); // Rilascia la connessione
-    }
-};
+                    db.query(statisticheQuery, [id], (err, statisticheResult) => {
+                        if (err) {
+                            return db.rollback(() => reject(err));
+                        }
+                        resultData.statistiche = statisticheResult;
 
+                        // Se tutto è andato bene, effettuiamo il commit
+                        db.commit((err) => {
+                            if (err) {
+                                return db.rollback(() => reject(err));
+                            }
+                            resolve(resultData); // Restituisce il risultato completo
+                        });
+                    });
+                });
+            });
+        });
+    });
+}
 
 // Ottenere un dataset specifico
 router.get("/get/:id", async (req, res) => {
 
-    const db = req.db;
+
+    getDataset(req.params.id, req).then((data) => {
+        res.json(data)
+    })
+        .catch((err) => {
+            res.status(500).json({ error: "Errore nel database", details: err })
+            console.error("Errore:", err);
+        });
 
 
-    const { id } = req.params;
-
-    try {
-        // Query per ottenere i dati del dataset
-        const [datasetRows] = await db.query("SELECT * FROM datasets WHERE id = ?", [id]);
-
-        if (datasetRows.length === 0) {
-            return res.status(404).json({ error: "Dataset non trovato" });
-        }
-
-        const dataset = datasetRows[0];
-
-        // Eseguiamo entrambe le altre query in parallelo
-        const [categoryRows, statisticheRows] = await Promise.all([
-            db.query("SELECT titolocategoria, valorecategoria FROM categorydatasets WHERE datasetriferimento = ?", [id]),
-            db.query("SELECT titolocategoria, valorecategoria FROM statistichedatasets WHERE datasetriferimento = ?", [id]),
-        ]);
-
-        // Costruiamo l'oggetto di risposta
-        const result = {
-            datasetData: {
-                title: dataset.title,
-                descrizione: dataset.descrizione,
-                rating: dataset.rating || 0.0,
-                storage: dataset.storage,
-                category: dataset.category,
-                img: dataset.img,
-                status: dataset.status || "Pending",
-                username: dataset.username,
-            },
-            categoryData: categoryRows[0], // Array di categorie associate
-            statisticheData: statisticheRows[0], // Array di statistiche associate
-        };
-
-        res.json(result);
-    } catch (error) {
-        console.error("Errore nel recupero del dataset:", error);
-        res.status(500).json({ error: "Errore del server" });
-    }
 });
+
 
 // Ottenere tutti i dataset presenti nel sistema
 router.get("/all", (req, res) => {

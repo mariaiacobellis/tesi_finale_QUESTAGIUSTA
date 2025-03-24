@@ -26,6 +26,8 @@ const DatasetDetail = () => {
     const [loading, setLoading] = useState(false);
     const [rows, setRows] = useState([]);
     const [columns, setColumns] = useState([]);
+    const [category, setCategory] = useState([]);
+    const [statistiche, setStatistiche] = useState([]);
 
 
     // Funzione per il download del file
@@ -90,9 +92,17 @@ const DatasetDetail = () => {
                 const response = await axios.get(`http://localhost:5000/datasets/get/${id}`);
                 console.log("Response:", response.data);
 
-                if (response.data.datasets) {
-                    setDataset(response.data.datasets);
+                console.log(response.data.dataset);
+
+                if (response.data.dataset[0]) {
+                    console.log("entro");
+                    setDataset(response.data.dataset[0]);
                     console.log(dataset);
+                    const categoryMap = Object.fromEntries(response.data.category.map(item => [item.titolocategoria, item.valorecategoria]));
+                    setCategory(categoryMap);
+                    const statisticheMap = Object.fromEntries(response.data.statistiche.map(item => [item.titolocategoria, item.valorecategoria]));
+                    setStatistiche(statisticheMap);
+                    console.log(categoryMap);
                 } else {
                     console.error("Nessun dataset trovato nella risposta!");
                 }
@@ -113,17 +123,14 @@ const DatasetDetail = () => {
         return <Typography variant="h4" color="error">Dataset non trovato</Typography>;
     }
 
-    const veryColdUser = 0;
-    const coldUser = 0;
-    const warmUser = 0;
-    const hotUser = 0;
+
     // Dati per l'istogramma
     const histogramData = {
         labels: ['Very Cold', 'Cold', 'Warm', 'Hot'], // Nuove etichette per il grafico
         datasets: [
             {
                 label: 'Numero di utenti',
-                data: [veryColdUser, coldUser, warmUser, hotUser],  // Assegna i valori calcolati per ogni categoria
+                data: [statistiche.veryColdUser, statistiche.coldUser, statistiche.warmUser, statistiche.hotUser],  // Assegna i valori calcolati per ogni categoria
                 backgroundColor: colors.blueAccent[500],
                 borderColor: colors.blueAccent[800],
                 borderWidth: 1,
@@ -132,10 +139,7 @@ const DatasetDetail = () => {
     };
 
 
-    const VeryColdItem = 0;
-    const ColdItem = 0;
-    const WarmItem = 0;
-    const PopularItem = 0;
+
 
     // Dati per l'istogramma
     const histogramData2 = {
@@ -143,7 +147,7 @@ const DatasetDetail = () => {
         datasets: [
             {
                 label: 'Numero items',
-                data: [VeryColdItem, ColdItem, WarmItem, PopularItem],  // Assegna i valori calcolati per ogni categoria
+                data: [statistiche.VeryColdItem, statistiche.ColdItem, statistiche.WarmItem, statistiche.PopularItem],  // Assegna i valori calcolati per ogni categoria
                 backgroundColor: colors.blueAccent[500],
                 borderColor: colors.blueAccent[800],
                 borderWidth: 1,
@@ -176,15 +180,15 @@ const DatasetDetail = () => {
                         {dataset?.title}
                     </Typography>
                     <Typography variant="body1" color={colors.grey[100]} mb={2}>
-                        {dataset?.description}
+                        {dataset?.descrizione}
                     </Typography>
                     <Typography variant="subtitle1" color={colors.greenAccent[500]}>
                         Categoria: {dataset?.category}
                     </Typography>
 
-                    {/* Griglia con tutti i campi */}
+
                     <Grid container spacing={2} mt={2} sx={{ maxWidth: '100%', width: '100%' }}>
-                        {Object.entries(dataset || {})
+                        {Object.entries(category || {})
                             .filter(([key, value]) =>
                                 value &&
                                 !["keywords", "storage", "category", "img", "rating", "id", "numRatings", "numUsers", "numItems", "density", "status", "title"].includes(key)
@@ -197,25 +201,25 @@ const DatasetDetail = () => {
                                 </Grid>
                             ))}
 
-                        {/* Link URL */}
-                        {dataset?.url && (
+
+                        {category?.url && (
                             <Grid item xs={12}>
-                                <Button variant="outlined" color="info" href={dataset.url} target="_blank">
+                                <Button variant="outlined" color="info" href={category.url} target="_blank">
                                     🔗 Apri URL
                                 </Button>
                             </Grid>
                         )}
 
-                        {/* DOI */}
-                        {dataset?.doi && (
+
+                        {category?.doi && (
                             <Grid item xs={12}>
-                                <Button variant="outlined" color="info" href={`https://doi.org/${dataset.doi}`} target="_blank">
+                                <Button variant="outlined" color="info" href={`https://doi.org/${category.doi}`} target="_blank">
                                     📄 Apri DOI
                                 </Button>
                             </Grid>
                         )}
 
-                        {/* Pulsante di download */}
+
                         {dataset?.storage && (
                             <Grid item xs={12}>
                                 <Button variant="contained" color="secondary" onClick={() => downloadFile()}>
@@ -275,15 +279,15 @@ const DatasetDetail = () => {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                {/* Inseriamo il grafico al posto di N. utenti */}
+
                                 <TableCell sx={{ color: colors.grey[100], height: "100px", width: "100px" }}>
                                     <Bar data={histogramData} options={chartOptions} />
                                 </TableCell>
                                 <TableCell sx={{ color: colors.grey[100], height: "100px", width: "100px" }}>
                                     <Bar data={histogramData2} options={chartOptions} />
                                 </TableCell>
-                                <TableCell sx={{ color: colors.grey[100] }}><strong>N. ratings:</strong> {dataset?.numRatings || "Dati non disponibili"}</TableCell>
-                                <TableCell sx={{ color: colors.grey[100] }}><strong>Density:</strong> {dataset?.density || "Dati non disponibili"}</TableCell>
+                                <TableCell sx={{ color: colors.grey[100] }}><strong>N. ratings:</strong> {statistiche?.numRatings || "Dati non disponibili"}</TableCell>
+                                <TableCell sx={{ color: colors.grey[100] }}><strong>Density:</strong> {statistiche?.density || "Dati non disponibili"}</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>

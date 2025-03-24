@@ -50,7 +50,7 @@ const Add = () => {
         setAddedFields([...addedFields, { key: selectedField, value: fieldValue }]);
         //setDataset({ ...dataset, [selectedField]: fieldValue });
         // Controlla se titolocategoria è uno dei campi numerici e aggiunge a statisticheData
-        const numericFields = ['numRatings', 'numUsers', 'numItems', 'density'];
+        const numericFields = ['numRatings', 'numUsers', 'numItems', 'density', 'veryColdUser', 'coldUser', 'warmUser', 'hotUser', 'VeryColdItem', 'ColdItem', 'WarmItem', 'PopularItem'];
 
         if (numericFields.includes(selectedField)) {
             // Se titolocategoria è uno dei campi numerici, inserisci in statisticheData
@@ -133,7 +133,7 @@ const Add = () => {
 
         console.log(statistiche);
 
-        dataset.descrizione="ciaoooo";
+
 
         try {
             const response = await axios.post("http://localhost:5000/datasets/add", {
@@ -197,6 +197,20 @@ const Add = () => {
                             required
                             value={dataset.category}
                             onChange={(e) => setDataset({ ...dataset, category: e.target.value })}
+                            sx={{ mb: 2 }}
+                        />
+
+                        {/* Descrizione */}
+                        <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mb: 2 }}>
+                            Descrizione
+                        </Typography>
+                        <TextField
+                            label="Descrizione"
+                            variant="outlined"
+                            fullWidth
+                            required
+                            value={dataset.descrizione}
+                            onChange={(e) => setDataset({ ...dataset, descrizione: e.target.value })}
                             sx={{ mb: 2 }}
                         />
 
