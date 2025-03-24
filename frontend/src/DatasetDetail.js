@@ -113,20 +113,17 @@ const DatasetDetail = () => {
         return <Typography variant="h4" color="error">Dataset non trovato</Typography>;
     }
 
-    // Calcolo dei dati dell'istogramma in base al numero di utenti
-    const totalUsers = dataset.numUsers || 0;
-    const veryCold = Math.floor(totalUsers * 0.1);  // 10% degli utenti
-    const cold = Math.floor(totalUsers * 0.2);     // 20% degli utenti
-    const warm = Math.floor(totalUsers * 0.3);     // 30% degli utenti
-    const hot = totalUsers - (veryCold + cold + warm); // Resto per "Hot"
-
+    const veryColdUser = 0;
+    const coldUser = 0;
+    const warmUser = 0;
+    const hotUser = 0;
     // Dati per l'istogramma
     const histogramData = {
         labels: ['Very Cold', 'Cold', 'Warm', 'Hot'], // Nuove etichette per il grafico
         datasets: [
             {
                 label: 'Numero di utenti',
-                data: [veryCold, cold, warm, hot],  // Assegna i valori calcolati per ogni categoria
+                data: [veryColdUser, coldUser, warmUser, hotUser],  // Assegna i valori calcolati per ogni categoria
                 backgroundColor: colors.blueAccent[500],
                 borderColor: colors.blueAccent[800],
                 borderWidth: 1,
@@ -134,12 +131,11 @@ const DatasetDetail = () => {
         ],
     };
 
-    // Calcolo dei dati dell'istogramma in base al numero di utenti
-    const totalItems = dataset.numItems || 0;
-    const VeryCold = Math.floor(totalItems * 0.1);  // 10% degli utenti
-    const Cold = Math.floor(totalItems* 0.2);     // 20% degli utenti
-    const Warm = Math.floor(totalItems * 0.3);     // 30% degli utenti
-    const Popular = totalItems - (veryCold + cold + warm); // Resto per "Hot"
+
+    const VeryColdItem = 0;
+    const ColdItem = 0;
+    const WarmItem = 0;
+    const PopularItem = 0;
 
     // Dati per l'istogramma
     const histogramData2 = {
@@ -147,7 +143,7 @@ const DatasetDetail = () => {
         datasets: [
             {
                 label: 'Numero items',
-                data: [VeryCold, Cold, Warm, Popular],  // Assegna i valori calcolati per ogni categoria
+                data: [VeryColdItem, ColdItem, WarmItem, PopularItem],  // Assegna i valori calcolati per ogni categoria
                 backgroundColor: colors.blueAccent[500],
                 borderColor: colors.blueAccent[800],
                 borderWidth: 1,

@@ -27,7 +27,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 const fields = [
     "author", "editor", "booktitle", "pages", "series", "volume", "publisher",
     "year", "number", "location", "address", "keywords", "url", "doi", "timestamp",
-    "biburl", "bibsource", "journal", "numRatings", "numUsers", "numItems", "density"
+    "biburl", "bibsource", "journal", "numRatings", "numUsers", "numItems", "density", "veryColdUser", "coldUser", "warmUser", "hotUser", "VeryColdItem", "ColdItem", "WarmItem", "PopularItem"
 ];
 
 const Add = () => {
@@ -105,10 +105,25 @@ const Add = () => {
             }
         }
 
-        console.log(dataset);
+
+        const categoryArray = [];
+        const statisticheArray = [];
 
         try {
-            const response = await axios.post("http://localhost:5000/datasets/add", dataset);
+            const response = await axios.post("http://localhost:5000/datasets/add", {
+                datasetData: {
+                    title:dataset.title,
+                    descrizione: dataset.descrizione,
+                    rating: 0.0,
+                    storage: dataset.storage,
+                    category: dataset.category,
+                    img: dataset.img,
+                    status: "Pending",
+                    username: isLoggedIn
+                },
+                categoryData: categoryArray,
+                statisticheData: statisticheArray
+            });
             console.log(response);
             // Mostra il messaggio di successo
             setOpenSuccessSnackbar(true);

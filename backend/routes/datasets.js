@@ -81,7 +81,7 @@ router.post("/add", async (req, res) => {
     const {
         author, editor, title, booktitle, pages, series, volume, publisher,
         year, number, location, address, keywords, url, doi, timestamp,
-        biburl, bibsource, journal, rating, storage, category, img, numRatings, numUsers, numItems, density
+        biburl, bibsource, journal, rating, storage, category, img, numRatings, numUsers, numItems, density, veryColdUser, coldUser, warmUser, hotUser, VeryColdItem, ColdItem, WarmItem, PopularItem
     } = req.body;
 
     // Converte undefined → NULL per sicurezza
@@ -114,14 +114,22 @@ router.post("/add", async (req, res) => {
         numUsers || 0.0,
         numItems || 0.0,
         density || 0.0,
-        status
+        status,
+        veryColdUser || 0.0,
+        coldUser || 0.0,
+        warmUser || 0.0,
+        hotUser || 0.0,
+        VeryColdItem || 0.0,
+        ColdItem || 0.0,
+        WarmItem || 0.0,
+        PopularItem || 0.0
     ];
 
     const sql = `
         INSERT INTO datasets (
             author, editor, title, booktitle, pages, series, volume, publisher, year,
-            number, location, address, keywords, url, doi, timestamp, biburl, bibsource, journal, rating, storage, category, img, numRatings, numUsers, numItems, density, status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+            number, location, address, keywords, url, doi, timestamp, biburl, bibsource, journal, rating, storage, category, img, numRatings, numUsers, numItems, density, status, veryColdUser, coldUser, warmUser, hotUser, VeryColdItem, ColdItem, WarmItem, PopularItem
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?)
     `;
 
     db.query(sql, publicationData, (err, result) => {
