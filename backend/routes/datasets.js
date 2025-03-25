@@ -318,22 +318,80 @@ router.put("/status/:id", (req, res) => {
     });
 });
 
+function deleteDataset(id, req) {
+    return new Promise((resolve, reject) => {
+        const db = req.db; // Connessione al database
+
+        db.beginTransaction((err) => {
+            if (err) {
+                return reject(err);
+            }
+
+            // Query per eliminare i commenti relativi al dataset
+            const deleteCommentsQuery = "DELETE FROM comments WHERE riferimento_id = ?";
+
+            db.query(deleteCommentsQuery, [id], (err, commentsResult) => {
+                if (err) {
+                    return db.rollback(() => reject(err));
+                }
+
+                // Query per eliminare le categorie associate al dataset
+                const deleteCategoriesQuery = "DELETE FROM categorydatasets WHERE datasetriferimento = ?";
+
+                db.query(deleteCategoriesQuery, [id], (err, categoryResult) => {
+                    if (err) {
+                        return db.rollback(() => reject(err));
+                    }
+
+                    // Query per eliminare le statistiche associate al dataset
+                    const deleteStatisticheQuery = "DELETE FROM statistichedatasets WHERE datasetriferimento = ?";
+
+                    db.query(deleteStatisticheQuery, [id], (err, statisticheResult) => {
+                        if (err) {
+                            return db.rollback(() => reject(err));
+                        }
+
+                        // Query per eliminare il dataset stesso
+                        const deleteDatasetQuery = "DELETE FROM datasets WHERE id = ?";
+
+                        db.query(deleteDatasetQuery, [id], (err, datasetResult) => {
+                            if (err) {
+                                return db.rollback(() => reject(err));
+                            }
+
+                            // Se tutto è andato bene, effettuiamo il commit
+                            db.commit((err) => {
+                                if (err) {
+                                    return db.rollback(() => reject(err));
+                                }
+                                resolve({
+                                    message: "Dataset eliminato con successo",
+                                    affectedRows: {
+                                        comments: commentsResult.affectedRows,
+                                        categories: categoryResult.affectedRows,
+                                        statistiche: statisticheResult.affectedRows,
+                                        dataset: datasetResult.affectedRows
+                                    }
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+}
+
 router.delete("/:id", (req, res) => {
     const datasetId = req.params.id;
-    const db = req.db; // Connessione al database
-    const sql = "DELETE FROM datasets WHERE id = ?";
 
-    db.query(sql, [datasetId], (err, result) => {
-        if (err) {
-            console.error("Errore nell'eliminazione del dataset:", err);
-            return res.status(500).json({ message: "Errore interno del server" });
-        }
+    deleteDataset(datasetId,req).then((data) => {
+        res.json(data)
+    })
+        .catch((err) => {
+            res.status(500).json({ error: "Errore nel database", details: err })
+            console.error("Errore:", err);
+        });
 
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ message: "Dataset non trovato" });
-        }
-
-        res.status(200).json({ message: "Dataset eliminato con successo" });
-    });
 });
 export default router;

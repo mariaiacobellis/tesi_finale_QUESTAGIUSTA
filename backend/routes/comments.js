@@ -32,7 +32,7 @@ router.get("/ref/:riferimento_id", (req, res) => {
 router.post("/", (req, res) => {
     const { riferimento_id, riferimento_tipo, username, comment, rating } = req.body;
     const db = req.db;
-     console.log(req.body)
+    console.log(req.body)
     if (!riferimento_id || !riferimento_tipo || !username || !comment) {
         return res.status(400).json({ error: "Tutti i campi obbligatori devono essere compilati" });
     }
@@ -48,37 +48,40 @@ router.post("/", (req, res) => {
 
             // Se il rating è null, non serve aggiornare il rating del dataset
             if (rating === null || rating === undefined) {
-                return res.status(201).json({ message: "Commento aggiunto con successo", id: result.insertId });
-            }
+                return res.status(201).json({ message: "Commento aggiunto con successo", id: result.insertId, comment:comment });
+            }else {
 
-            // Calcola la nuova media del rating per il dataset
-            db.query(
-                "SELECT AVG(rating) AS media_rating FROM comments WHERE riferimento_id = ? AND rating IS NOT NULL",
-                [riferimento_id],
-                (err, avgResult) => {
-                    if (err) {
-                        return res.status(500).json({ error: err.message });
-                    }
-
-                    const mediaRating = avgResult[0].media_rating || 0; // Se non ci sono rating, imposta 0
-
-                    // Aggiorna il rating nella tabella dataset
-                    db.query(
-                        "UPDATE datasets SET rating = ? WHERE id = ?",
-                        [mediaRating, riferimento_id],
-                        (err, updateResult) => {
-                            if (err) {
-                                return res.status(500).json({ error: err.message });
-                            }
-                            res.status(201).json({
-                                message: "Commento aggiunto e rating aggiornato",
-                                id: result.insertId,
-                                nuovo_rating: mediaRating
-                            });
+                // Calcola la nuova media del rating per il dataset
+                db.query(
+                    "SELECT AVG(rating) AS media_rating FROM comments WHERE riferimento_id = ? AND rating IS NOT NULL",
+                    [riferimento_id],
+                    (err, avgResult) => {
+                        if (err) {
+                            return res.status(500).json({error: err.message});
                         }
-                    );
-                }
-            );
+
+                        const mediaRating = avgResult[0].media_rating || 0.0 ; // Se non ci sono rating, imposta 0
+
+                        // Aggiorna il rating nella tabella dataset
+                        db.query(
+                            "UPDATE datasets SET rating = ? WHERE id = ?",
+                            [mediaRating, riferimento_id],
+                            (err, updateResult) => {
+                                if (err) {
+                                    return res.status(500).json({error: err.message});
+                                }
+                                res.status(201).json({
+                                    message: "Commento aggiunto e rating aggiornato",
+                                    id: result.insertId,
+                                    username: username,
+                                    rating: mediaRating,
+                                    comment: comment
+                                });
+                            }
+                        );
+                    }
+                );
+            }
         }
     );
 });

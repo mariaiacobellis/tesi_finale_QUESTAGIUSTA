@@ -39,7 +39,7 @@ const Sidebar = () => {
                     <MenuOutlinedIcon sx={{ color: colors.grey[100] }} /> // Icona menu al posto del nome
                 ) : (
                     <Typography variant="h6" color={colors.grey[100]}>
-                        NOME SITO
+                        DATAMATCH
                     </Typography>
                 )}
             </Box>

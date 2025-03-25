@@ -49,18 +49,59 @@ router.post("/", (req, res) => {
     );
 });
 
+function deleteDataset(id, req) {
+    return new Promise((resolve, reject) => {
+        const db = req.db; // Connessione al database
+
+        db.beginTransaction((err) => {
+            if (err) {
+                return reject(err);
+            }
+
+            // Query per eliminare i commenti relativi al dataset
+            const deleteCommentsQuery = `DELETE FROM comments WHERE riferimento_id = ?`;
+
+            db.query(deleteCommentsQuery, [id], (err, commentsResult) => {
+                if (err) {
+                    return db.rollback(() => reject(err));
+                }
+
+                // Query per eliminare le categorie associate al dataset
+                const deleteDiscussionsQuery = `DELETE FROM discussions WHERE id = ?`;
+
+                db.query(deleteDiscussionsQuery, [id], (err, discussionsResult) => {
+                    if (err) {
+                        return db.rollback(() => reject(err));
+                    }
+                    db.commit((err) => {
+                        if (err) {
+                            return db.rollback(() => reject(err));
+                        }
+                        resolve({
+                            message: "Dataset eliminato con successo",
+                            affectedRows: {
+                                comments: commentsResult.affectedRows,
+                                discussions: discussionsResult.affectedRows
+                            }
+                        });
+                    });
+                });
+            });
+        });
+    });
+}
+
+
 router.delete("/:id", (req, res) => {
     const { id } = req.params;
-    const db = req.db;
-    db.query("DELETE FROM discussions WHERE id = ?", [id], (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ message: "Discussione non trovata" });
-        }
-        res.json({ message: "Discussione eliminata con successo" });
-    });
+
+    deleteDataset(id,req).then((data) => {
+        res.json(data)
+    })
+        .catch((err) => {
+            res.status(500).json({ error: "Errore nel database", details: err })
+            console.error("Errore:", err);
+        });
 });
 
 // PUT - Modificare il titolo, il testo o entrambi

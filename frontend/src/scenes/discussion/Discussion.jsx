@@ -1,6 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import {
-    Container, Box, Card, CardContent, Typography, IconButton, Collapse, TextField, Button, Snackbar, Alert, Fab, Dialog, DialogActions, DialogContent, DialogTitle
+    Container,
+    Box,
+    Card,
+    CardContent,
+    Typography,
+    IconButton,
+    Collapse,
+    TextField,
+    Button,
+    Snackbar,
+    Alert,
+    Fab,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    MenuItem, Menu
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { tokens } from '../../theme';
@@ -13,6 +29,7 @@ const DiscussionPage = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [openIndex, setOpenIndex] = useState(null);
+    const [openIndexDelete, setOpenIndexDelete] = useState(false);
     const [discussions, setDiscussions] = useState([]);
     const [comments, setComments] = useState({});
     const [newDiscussionTitle, setNewDiscussionTitle] = useState('');
@@ -21,6 +38,7 @@ const DiscussionPage = () => {
     const [newCommentText, setNewCommentText] = useState('');
     const [selectedDiscussionId, setSelectedDiscussionId] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null)
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -47,6 +65,21 @@ const DiscussionPage = () => {
         }
     };
 
+    const handleToggleDelete = (event) => {
+        setAnchorEl(event.currentTarget)
+        setOpenIndexDelete(true)
+
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleElimina = (id) => {
+        axios.delete(`http://localhost:5000/discussions/${id}`)
+            .then(response => setDiscussions((prevDiscussions) => prevDiscussions.filter(discussion => discussion.id !== id)))
+            .catch(error => console.error("Errore nel recupero commenti:", error));
+
+    };
     const handleAddDiscussion = () => {
         if (!username) {
             setSnackbarOpen(true);
@@ -57,8 +90,9 @@ const DiscussionPage = () => {
             axios.post('http://localhost:5000/discussions', {
                 titolo: newDiscussionTitle,
                 username,
-                text_discussion: newDiscussionText
+                text_discussion: newDiscussionText,
             }).then(response => {
+
                 setDiscussions([response.data, ...discussions]);
                 setOpenDialog(false);
                 setNewDiscussionTitle('');
@@ -67,21 +101,25 @@ const DiscussionPage = () => {
         }
     };
 
-    const handleAddComment = () => {
+    const handleAddComment = (id) => {
         if (!username) {
             setSnackbarOpen(true);
             return;
         }
 
         if (newCommentText.trim()) {
+
             axios.post('http://localhost:5000/comments', {
-                discussion_id: selectedDiscussionId,
+                riferimento_id: id,
                 username,
-                text: newCommentText
+                riferimento_tipo:"Discussion",
+                rating : null,
+                comment: newCommentText
             }).then(response => {
+                console.log(response.data)
                 setComments(prev => ({
                     ...prev,
-                    [selectedDiscussionId]: [...(prev[selectedDiscussionId] || []), response.data]
+                    [id]: [...(prev[id] || []), response.data]
                 }));
                 setNewCommentText('');
             }).catch(error => console.error("Errore nell'aggiunta commento:", error));
@@ -106,14 +144,31 @@ const DiscussionPage = () => {
                                 <Typography variant="h6" fontWeight="bold">{discussion.titolo}</Typography>
                                 {discussion.username === username && (
                                     <IconButton
-                                        onClick={() => {
-                                            setSelectedDiscussionId(discussion.id);
-                                            handleToggle(discussion.id);
+                                        onClick={(event) => {
+                                            handleToggleDelete(event);
                                         }}
                                     >
                                         <MoreVertIcon />
                                     </IconButton>
                                 )}
+                                <Menu
+                                    id="demo-positioned-menu"
+                                    aria-labelledby="demo-positioned-button"
+                                    anchorEl={anchorEl}
+                                    open={ Boolean(anchorEl)}
+                                    onClose={handleClose}
+                                    anchorOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                >
+                                    <MenuItem onClick={()=> handleElimina(discussion.id)}>Elimina Discussione</MenuItem>
+
+                                </Menu>
                             </Box>
                             <Typography variant="body2" color={colors.grey[400]}>{discussion.text_discussion}</Typography>
 
@@ -140,7 +195,7 @@ const DiscussionPage = () => {
                                         value={newCommentText}
                                         onChange={(e) => setNewCommentText(e.target.value)}
                                     />
-                                    <Button variant="contained" color="primary" onClick={handleAddComment} sx={{ mt: 1 }}>
+                                    <Button variant="contained" color="primary" onClick={()=>handleAddComment(discussion.id)} sx={{ mt: 1 }}>
                                         Invia
                                     </Button>
                                 </Box>

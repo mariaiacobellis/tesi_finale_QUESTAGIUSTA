@@ -8,8 +8,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const faqs = [
     {
-        question: "Cos'è NOME SITO e cosa offre?",
-        answer: "NOME SITO è un sito web che offre gratuitamente dataset. Gli utenti possono scaricare, votare e caricare nuovi dataset per condividerli con altri utenti."
+        question: "Cos'è DATAMATCH e cosa offre?",
+        answer: "DATAMATCH è un sito web che offre gratuitamente dataset. Gli utenti possono scaricare, votare e caricare nuovi dataset per condividerli con altri utenti."
     },
     {
         question: "Chi può utilizzare questo sito web?",
