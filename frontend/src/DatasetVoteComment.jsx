@@ -42,7 +42,7 @@ const DatasetVoteComment = () => {
                 const datasetResponse = await axios.get(`http://localhost:5000/datasets/get/${id}`);
                 setDataset(datasetResponse.data);
 
-                const commentsResponse = await axios.get(`http://localhost:5000/comments/ref/${id}`);
+                const commentsResponse = await axios.get(`http://localhost:5000/comments/ref/dataset/${id}`);
                 setComments(commentsResponse.data);
 
                 const userCommented = commentsResponse.data.some(comment => comment.username === userId);

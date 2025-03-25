@@ -51,7 +51,7 @@ const DiscussionPage = () => {
     }, []);
 
     const fetchComments = (discussionId) => {
-        axios.get(`http://localhost:5000/comments/ref/${discussionId}`)
+        axios.get(`http://localhost:5000/comments/ref/Discussion/${discussionId}`)
             .then(response => setComments(prev => ({ ...prev, [discussionId]: response.data })))
             .catch(error => console.error("Errore nel recupero commenti:", error));
     };

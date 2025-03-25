@@ -1,11 +1,15 @@
 import { useState, useEffect, useContext } from "react";
-import {Box, IconButton, useTheme, InputBase, MenuItem, Menu} from "@mui/material";
+import {Box, IconButton, useTheme, InputBase, MenuItem, Menu, TextField} from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import { ColorModeContext, tokens } from "../../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchIcon from "@mui/icons-material/Search";
+import Autocomplete from "@mui/material/Autocomplete";
+import axios from "axios";
+
+
 
 const Topbar = () => {
     const theme = useTheme();
@@ -16,6 +20,35 @@ const Topbar = () => {
     const [showTopbar, setShowTopbar] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
     const[open, setOpen] = useState(false)
+    const [inputValue, setInputValue] = useState("");
+    const [dataset, setDatasets] = useState([]);
+
+
+    const handleSelect = (event, value) => {
+        if (value) {
+            navigate(`/datasets/${value.id}`);
+        }
+    };
+
+    useEffect(() => {
+        const fetchDatasets = async () => {
+            try {
+                const response = await axios.get('http://localhost:5000/datasets/all');
+                console.log("Response:", response.data);
+                if (response.data.datasets) {
+                    setDatasets(response.data.datasets);
+                } else {
+                    console.error("Nessun dataset trovato nella risposta!");
+                }
+            } catch (error) {
+                console.error("Errore nel fetch dei dataset:", error);
+            }
+        };
+
+
+        fetchDatasets();
+
+    }, []);
 
 
     useEffect(() => {
@@ -88,7 +121,17 @@ const Topbar = () => {
                             transition: "width 0.3s ease-in-out"
                         }}
                     >
-                        <InputBase sx={{ ml: 1, flex: 1 }} placeholder="Search" />
+                        <Autocomplete
+                            options={dataset}
+                            getOptionLabel={(option) => option.title}
+                            onChange={handleSelect}
+                            inputValue={inputValue}
+                            sx = {{flex:1, ml:1}}
+                            onInputChange={(event, newInputValue) => setInputValue(newInputValue)}
+                            renderInput={(params) => (
+                                <TextField {...params} label="Search" variant="outlined" fullWidth />
+                            )}
+                        />
                         <IconButton type="button" sx={{ p: 1 }}>
                             <SearchIcon />
                         </IconButton>

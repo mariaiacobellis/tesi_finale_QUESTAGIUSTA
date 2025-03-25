@@ -14,7 +14,7 @@ import {
     FormControl,
     InputLabel,
     Snackbar,
-    Alert
+    Alert, Modal, Backdrop, CircularProgress
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { tokens } from '../../theme';
@@ -45,6 +45,7 @@ const Add = () => {
 
     const [category, setCategory] = useState([]);
     const [statistiche, setStatistiche] = useState([]);
+    const [loading, setLoading] = useState(false)
     const handleAddField = () => {
         if (!selectedField || !fieldValue) return;
         setAddedFields([...addedFields, { key: selectedField, value: fieldValue }]);
@@ -103,6 +104,8 @@ const Add = () => {
             return;
         }
 
+        setLoading(true)
+
         if (dataset.tsvFile) {
             const formData = new FormData();
             formData.append('file', dataset.tsvFile);
@@ -151,6 +154,7 @@ const Add = () => {
                 statisticheData: statistiche
             });
             console.log(response);
+            setLoading(false)
             // Mostra il messaggio di successo
             setOpenSuccessSnackbar(true);
         } catch (error) {
@@ -168,6 +172,28 @@ const Add = () => {
 
     return (
         <Container maxWidth="md" sx={{ mt: 4, pb: 4 }}>
+            {<Modal open={loading} aria-labelledby="loading-modal" aria-describedby="loading-data">
+                <Backdrop open={loading} sx={{ zIndex: 1200, color: "#fff" }}>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            bgcolor: "rgba(0, 0, 0, 0.75)",
+                            borderRadius: 2,
+                            p: 4,
+                            boxShadow: 24,
+                            minWidth: 320,
+                        }}
+                    >
+                        <CircularProgress color="inherit" size={60} thickness={4.5} />
+                        <Typography variant="h6" sx={{ mt: 2, color: "#fff", fontWeight: "bold" }}>
+                            Caricamento in corso...
+                        </Typography>
+                    </Box>
+                </Backdrop>
+            </Modal>}
             <Header title="Aggiungi Dataset" subtitle="Inserisci un nuovo dataset" />
             <Box display="flex" flexDirection="column" gap={2}>
                 <Card sx={{ backgroundColor: colors.primary[400], boxShadow: 3, borderRadius: 2 }}>

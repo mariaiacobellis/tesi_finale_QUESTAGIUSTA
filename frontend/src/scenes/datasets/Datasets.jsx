@@ -61,7 +61,7 @@ const Datasets = () => {
     const groupedDatasets = groupByCategory(allDatasets);
 
     return (
-        <Box sx={{ backgroundColor: colors.primary[500], minHeight: '100vh' }}> {/* Cambiato il background con il colore primario */}
+        <Box sx={{  minHeight: '100vh' }}> {/* Cambiato il background con il colore primario */}
             <Container sx={{ padding: 2 }}>
                 <Header
                     title="Esplora i Dataset"

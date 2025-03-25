@@ -18,10 +18,10 @@ router.get("/:id", (req, res) => {
     });
 });
 
-router.get("/ref/:riferimento_id", (req, res) => {
-    const { riferimento_id } = req.params;
+router.get("/ref/:riferimento_tipo/:riferimento_id", (req, res) => {
+    const { riferimento_id, riferimento_tipo} = req.params;
     const db = req.db;
-    db.query("SELECT * FROM comments WHERE riferimento_id = ?", [riferimento_id], (err, results) => {
+    db.query("SELECT * FROM comments WHERE riferimento_id = ? AND riferimento_tipo= ?", [riferimento_id, riferimento_tipo], (err, results) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
