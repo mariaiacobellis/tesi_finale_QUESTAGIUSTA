@@ -171,14 +171,14 @@ const DatasetDetail = () => {
     return (
         <Box p={3} sx={{ width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
             {<Modal open={download} aria-labelledby="loading-modal" aria-describedby="loading-data">
-                <Backdrop open={download} sx={{ zIndex: 1200, color: "#fff" }}>
+                <Backdrop open={download} sx={{ zIndex: 1200, color: colors.grey[400] }}>
                     <Box
                         sx={{
                             display: "flex",
                             flexDirection: "column",
                             alignItems: "center",
                             justifyContent: "center",
-                            bgcolor: "rgba(0, 0, 0, 0.75)",
+                            bgcolor: colors.primary[400],
                             borderRadius: 2,
                             p: 4,
                             boxShadow: 24,
@@ -186,7 +186,7 @@ const DatasetDetail = () => {
                         }}
                     >
                         <CircularProgress color="inherit" size={60} thickness={4.5} />
-                        <Typography variant="h6" sx={{ mt: 2, color: "#fff", fontWeight: "bold" }}>
+                        <Typography variant="h6" sx={{ mt: 2, color: colors.grey[400], fontWeight: "bold" }}>
                             Caricamento in corso...
                         </Typography>
                     </Box>
