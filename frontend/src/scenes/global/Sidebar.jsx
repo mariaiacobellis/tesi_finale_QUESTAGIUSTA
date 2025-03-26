@@ -12,7 +12,7 @@ import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 const Sidebar = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-    const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // True se lo schermo è piccolo
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
     const [selected, setSelected] = useState("Homepage");
     const [admin, setAdmin] = useState("")
 
@@ -23,7 +23,7 @@ const Sidebar = () => {
             variant="permanent"
             anchor="left"
             sx={{
-                width: isMobile ? 80 : 240, // Sidebar più stretta su mobile
+                width: isMobile ? 80 : 240,
                 flexShrink: 0,
                 "& .MuiDrawer-paper": {
                     width: isMobile ? 80 : 240,
@@ -36,10 +36,10 @@ const Sidebar = () => {
             {/* HEADER */}
             <Box display="flex" alignItems="center" justifyContent="center" p={2}>
                 {isMobile ? (
-                    <MenuOutlinedIcon sx={{ color: colors.grey[100] }} /> // Icona menu al posto del nome
+                    <MenuOutlinedIcon sx={{ color: colors.grey[100] }} />
                 ) : (
                     <Typography variant="h6" color={colors.grey[100]}>
-                        DATAMATCH
+                        DataRec
                     </Typography>
                 )}
             </Box>
@@ -68,7 +68,7 @@ const SidebarItem = ({ title, to, icon, selected, setSelected, isMobile }) => {
                 onClick={() => setSelected(title)}
                 sx={{
                     color: colors.grey[100],
-                    justifyContent: isMobile ? "center" : "flex-start", // Centra l'icona su mobile
+                    justifyContent: isMobile ? "center" : "flex-start",
                     "&.Mui-selected": { backgroundColor: colors.blueAccent[700] },
                     "&:hover": { backgroundColor: colors.blueAccent[100] },
                 }}

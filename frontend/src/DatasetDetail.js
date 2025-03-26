@@ -187,7 +187,7 @@ const DatasetDetail = () => {
                     >
                         <CircularProgress color="inherit" size={60} thickness={4.5} />
                         <Typography variant="h6" sx={{ mt: 2, color: colors.grey[400], fontWeight: "bold" }}>
-                            Caricamento in corso...
+                            Download in corso...
                         </Typography>
                     </Box>
                 </Backdrop>

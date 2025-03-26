@@ -1,41 +1,41 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, Button, Grid, Card, CardContent, CardMedia } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { tokens } from "../../theme"; // I tuoi colori personalizzati
-import { useNavigate } from "react-router-dom"; // Importa useNavigate
-import axios from "axios"; // Importa axios per fare richieste HTTP
+import { tokens } from "../../theme";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Homepage = () => {
-    const theme = useTheme(); // Ottieni il tema corrente
-    const colors = tokens(theme.palette.mode); // Ottieni i colori in base alla modalità (light/dark)
-    const navigate = useNavigate(); // Inizializza navigate
-    const [trendingDatasets, setTrendingDatasets] = useState([]); // Stato per i dataset trending
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+    const navigate = useNavigate();
+    const [trendingDatasets, setTrendingDatasets] = useState([]);
 
     useEffect(() => {
         // Funzione per ottenere i trending datasets
         const fetchTrendingDatasets = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/datasets/trending'); // Chiamata all'API
+                const response = await axios.get('http://localhost:5000/datasets/trending');
                 if (response.data.datasets) {
-                    setTrendingDatasets(response.data.datasets); // Aggiorna lo stato con i dati ricevuti
+                    setTrendingDatasets(response.data.datasets);
                 }
             } catch (error) {
                 console.error("Errore nel recupero dei trending datasets:", error);
             }
         };
 
-        fetchTrendingDatasets(); // Chiamata per ottenere i dati quando il componente si monta
-    }, []); // Questo effetto viene eseguito solo una volta al caricamento del componente
+        fetchTrendingDatasets();
+    }, []);
 
     return (
         <>
             {/* Hero Section con immagine di sfondo */}
             <Card
                 sx={{
-                    minHeight: "50vh", // Puoi mantenere l'altezza desiderata
-                    width: "95%", // Aumenta la larghezza al 95% del contenitore
-                    maxWidth: "700px", // Imposta una larghezza massima (puoi regolarla)
-                    margin: "0 auto", // Questo centra la card orizzontalmente
+                    minHeight: "50vh",
+                    width: "95%",
+                    maxWidth: "700px",
+                    margin: "0 auto",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
@@ -44,8 +44,8 @@ const Homepage = () => {
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     textAlign: "center",
-                    color: colors.grey[100], // Colore principale del testo (simile al secondo esempio)
-                    p: 6, // Puoi mantenere il padding ridotto
+                    color: colors.grey[100],
+                    p: 6,
                     borderRadius: 2,
                     boxShadow: 3,
                 }}
@@ -70,7 +70,7 @@ const Homepage = () => {
                             "&:hover": { backgroundColor: colors.blueAccent[600] },
                         }}
                         size="large"
-                        onClick={() => navigate("/datasets")} // Naviga alla pagina /datasets
+                        onClick={() => navigate("/datasets")}
                     >
                         Esplora Dataset
                     </Button>
@@ -94,8 +94,8 @@ const Homepage = () => {
                                                 component="img"
                                                 alt={dataset.title}
                                                 height="140"
-                                                image={dataset.img} // L'URL dell'immagine
-                                                sx={{ marginBottom: 2 }} // Aggiungi uno spazio inferiore all'immagine
+                                                image={dataset.img}
+                                                sx={{ marginBottom: 2 }}
                                             />
                                         )}
                                         <Typography variant="h6" sx={{ fontWeight: "bold", color: colors.grey[100] }}>
@@ -105,11 +105,11 @@ const Homepage = () => {
                                             variant="outlined"
                                             sx={{
                                                 mt: 2,
-                                                borderColor: colors.blueAccent[500], // Bordo più chiaro
-                                                color: colors.blueAccent[500], // Colore più scuro per il testo
-                                                "&:hover": { backgroundColor: colors.blueAccent[100] }, // Hover chiaro
+                                                borderColor: colors.blueAccent[500],
+                                                color: colors.blueAccent[500],
+                                                "&:hover": { backgroundColor: colors.blueAccent[100] },
                                             }}
-                                            onClick={() => navigate(`/datasets/${dataset.id}`)} // Naviga alla pagina del dataset specifico
+                                            onClick={() => navigate(`/datasets/${dataset.id}`)}
                                         >
                                             Scopri di più
                                         </Button>
@@ -137,7 +137,7 @@ const Homepage = () => {
                         maxWidth: "800px",
                         margin: "0 auto",
                         mb: 4,
-                        color: colors.grey[100], // Cambia il colore del testo per renderlo simile agli altri testi
+                        color: colors.grey[100],
                     }}
                 >
                     Condividi il tuo sapere, partecipa a competizioni di analisi dati e migliora le tue competenze
@@ -147,16 +147,16 @@ const Homepage = () => {
                 <Button
                     variant="contained"
                     sx={{
-                        backgroundColor: colors.blueAccent[500], // Colore primario più chiaro
-                        "&:hover": { backgroundColor: colors.blueAccent[600] }, // Hover più scuro
-                        color: colors.grey[100], // Colore chiaro per il testo
+                        backgroundColor: colors.blueAccent[500],
+                        "&:hover": { backgroundColor: colors.blueAccent[600] },
+                        color: colors.grey[100],
                         fontSize: "1.2rem",
                         padding: "12px 24px",
                         borderRadius: "30px",
                         transition: "all 0.3s ease",
                     }}
                     size="large"
-                    onClick={() => navigate("/register")} // Naviga alla pagina /register
+                    onClick={() => navigate("/register")}
                 >
                     Partecipa Ora
                 </Button>

@@ -45,10 +45,10 @@ const Admin = () => {
             const response = await axios.put(`http://localhost:5000/datasets/status/${id}`);
 
             if (response.status === 200) {
-                // Trova il dataset approvato
+
                 const approvedDataset = pendingDatasets.find(ds => ds.id === id);
 
-                // Aggiorna gli stati
+
                 setPendingDatasets(prev => prev.filter(ds => ds.id !== id));
                 setAllDatasets(prev => [...prev, approvedDataset]);
             }

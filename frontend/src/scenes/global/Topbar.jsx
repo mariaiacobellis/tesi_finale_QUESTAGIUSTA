@@ -76,11 +76,11 @@ const Topbar = () => {
     const onLogout = () => {
         localStorage.removeItem("username");
         setOpen(false);
-        navigate("/login"); // Porta l'utente alla pagina di login
+        navigate("/login");
     };
     const onAdmin= () => {
         setOpen(false);
-        navigate("/admin"); // Porta l'utente alla pagina di login
+        navigate("/admin");
     };
 
 

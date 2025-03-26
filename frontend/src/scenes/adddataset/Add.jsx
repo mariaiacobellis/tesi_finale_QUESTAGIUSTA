@@ -49,15 +49,14 @@ const Add = () => {
     const handleAddField = () => {
         if (!selectedField || !fieldValue) return;
         setAddedFields([...addedFields, { key: selectedField, value: fieldValue }]);
-        //setDataset({ ...dataset, [selectedField]: fieldValue });
-        // Controlla se titolocategoria è uno dei campi numerici e aggiunge a statisticheData
+
         const numericFields = ['numRatings', 'numUsers', 'numItems', 'density', 'veryColdUser', 'coldUser', 'warmUser', 'hotUser', 'VeryColdItem', 'ColdItem', 'WarmItem', 'PopularItem'];
 
         if (numericFields.includes(selectedField)) {
-            // Se titolocategoria è uno dei campi numerici, inserisci in statisticheData
+
             setStatistiche([...statistiche, { titolocategoria: selectedField, valorecategoria: parseFloat(fieldValue) }]);
         } else {
-            // Altrimenti inserisci in categoryData
+
             setCategory([...category, { titolocategoria: selectedField, valorecategoria: fieldValue }]);
         }
         setSelectedField("");
@@ -67,16 +66,16 @@ const Add = () => {
     const handleRemoveField = (index, key) => {
         const newFields = addedFields.filter((_, i) => i !== index);
         setAddedFields(newFields);
-        // Verifica se l'elemento appartiene a statisticheData o categoryData
+
         const itemInStatistiche = statistiche[index];
         const itemInCategory = category[index];
 
         if (itemInStatistiche) {
-            // Rimuove l'elemento da statisticheData
+
             const newStatistiche = statistiche.filter((_, i) => i !== index);
             setStatistiche(newStatistiche);
         } else if (itemInCategory) {
-            // Rimuove l'elemento da categoryData
+
             const newCategory = category.filter((_, i) => i !== index);
             setCategory(newCategory);
         }
@@ -85,12 +84,12 @@ const Add = () => {
     const handleSubmit = async () => {
         const isLoggedIn = localStorage.getItem('username'); // Verifica se l'utente è loggato
         if (!isLoggedIn) {
-            // Se non loggato, salva la pagina corrente e redirige alla login
+
             localStorage.setItem('redirectAfterLogin', '/adddatasets');
             setOpenSnackbar(true); // Apre il banner
             setTimeout(() => {
-                navigate('/login'); // Redirige alla pagina di login dopo che il banner è stato mostrato
-            }, 3000); // Aspetta 3 secondi prima di fare il reindirizzamento
+                navigate('/login');
+            }, 3000);
             return;
         }
 
@@ -155,7 +154,7 @@ const Add = () => {
             });
             console.log(response);
             setLoading(false)
-            // Mostra il messaggio di successo
+
             setOpenSuccessSnackbar(true);
         } catch (error) {
             console.error("Errore durante il caricamento del dataset:", error);

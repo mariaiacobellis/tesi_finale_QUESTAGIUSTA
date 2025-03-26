@@ -211,9 +211,9 @@ const DiscussionPage = () => {
                     position: 'fixed',
                     bottom: 16,
                     right: 16,
-                    backgroundColor: colors.greenAccent[500], // Cambia il colore qui
+                    backgroundColor: colors.greenAccent[500],
                     '&:hover': {
-                        backgroundColor: colors.greenAccent[700], // Cambia anche il colore al passaggio del mouse, se necessario
+                        backgroundColor: colors.greenAccent[700],
                     },
                 }}
                 aria-label="add"
@@ -236,19 +236,19 @@ const DiscussionPage = () => {
                         sx={{
                             mb: 2,
                             backgroundColor: colors.primary[400],
-                            color: colors.grey[100], // Colore del testo
+                            color: colors.grey[100],
                             '& .MuiInputLabel-root': {
-                                color: colors.grey[100], // Colore del label
+                                color: colors.grey[100],
                             },
                             '& .MuiOutlinedInput-root': {
                                 '& fieldset': {
-                                    borderColor: colors.grey[100], // Colore del bordo
+                                    borderColor: colors.grey[100],
                                 },
                                 '&:hover fieldset': {
-                                    borderColor: colors.grey[100], // Colore del bordo al passaggio del mouse
+                                    borderColor: colors.grey[100],
                                 },
                                 '&.Mui-focused fieldset': {
-                                    borderColor: colors.grey[100], // Colore del bordo quando è in focus
+                                    borderColor: colors.grey[100],
                                 },
                             },
                         }}
@@ -263,19 +263,19 @@ const DiscussionPage = () => {
                         sx={{
                             mb: 2,
                             backgroundColor: colors.primary[400],
-                            color: colors.grey[100], // Colore del testo
+                            color: colors.grey[100],
                             '& .MuiInputLabel-root': {
-                                color: colors.grey[100], // Colore del label
+                                color: colors.grey[100],
                             },
                             '& .MuiOutlinedInput-root': {
                                 '& fieldset': {
-                                    borderColor: colors.grey[100], // Colore del bordo
+                                    borderColor: colors.grey[100],
                                 },
                                 '&:hover fieldset': {
-                                    borderColor: colors.grey[100], // Colore del bordo al passaggio del mouse
+                                    borderColor: colors.grey[100],
                                 },
                                 '&.Mui-focused fieldset': {
-                                    borderColor: colors.grey[100], // Colore del bordo quando è in focus
+                                    borderColor: colors.grey[100],
                                 },
                             },
                         }}

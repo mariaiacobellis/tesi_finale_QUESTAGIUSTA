@@ -61,14 +61,14 @@ const Datasets = () => {
     const groupedDatasets = groupByCategory(allDatasets);
 
     return (
-        <Box sx={{  minHeight: '100vh' }}> {/* Cambiato il background con il colore primario */}
+        <Box sx={{  minHeight: '100vh' }}>
             <Container sx={{ padding: 2 }}>
                 <Header
                     title="Esplora i Dataset"
                     subtitle="Trova i migliori dataset per il tuo progetto di machine learning, computer vision e altro."
                 />
 
-                {/* Trending Datasets Section */}
+                {/* Trending Datasets */}
                 <Box sx={{ marginBottom: 4 }}>
                     <Typography variant="h4" sx={{ textAlign: "center", fontWeight: "bold", marginBottom: 2 }}>
                         Trending Datasets

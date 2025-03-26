@@ -12,8 +12,8 @@ const DatasetList = ({ datasets, showNavigation = true }) => {
     const [maxVisibleCards, setMaxVisibleCards] = useState(1);
     const [startIndex, setStartIndex] = useState(0);
 
-    // Usa i breakpoint per determinare la larghezza del dispositivo
-    const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Mostra uno alla volta sui dispositivi mobili
+
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
     useEffect(() => {
         const updateVisibleCards = () => {
@@ -49,22 +49,22 @@ const DatasetList = ({ datasets, showNavigation = true }) => {
 
     return (
         <Box display="flex" alignItems="center" justifyContent="center" width="100%">
-            {showNavigation && ( // Mostra i bottoni solo se showNavigation è true
+            {showNavigation && (
                 <>
-                    {/* Bottone SINISTRA */}
+
                     <Button onClick={prevCards} disabled={startIndex === 0} sx={{ minWidth: "50px" }}>
                         <ArrowBack sx={{ color: startIndex === 0 ? "gray" : colors.blueAccent[500] }} />
                     </Button>
                 </>
             )}
 
-            {/* Contenitore delle card, allineato al centro */}
+
             <Box
                 ref={containerRef}
                 sx={{
                     flexGrow: 1,
                     display: "flex",
-                    justifyContent: "center", // Centra le card
+                    justifyContent: "center",
                     overflow: "hidden",
                     whiteSpace: "nowrap",
                     width: { xs: "90%", sm: "80%", md: "70%" },
@@ -82,9 +82,9 @@ const DatasetList = ({ datasets, showNavigation = true }) => {
                 </Grid>
             </Box>
 
-            {showNavigation && ( // Mostra i bottoni solo se showNavigation è true
+            {showNavigation && (
                 <>
-                    {/* Bottone DESTRA */}
+
                     <Button onClick={nextCards} disabled={startIndex + maxVisibleCards >= datasets.length} sx={{ minWidth: "50px" }}>
                         <ArrowForward sx={{ color: startIndex + maxVisibleCards >= datasets.length ? "gray" : colors.blueAccent[500] }} />
                     </Button>

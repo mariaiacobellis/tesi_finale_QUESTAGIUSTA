@@ -17,16 +17,16 @@ const LoginPage = () => {
 
     const onLogin = async () => {
         try {
-            setError(""); // Rimuove il messaggio di errore se il login è corretto
+            setError("");
             const res = await axios.post("http://localhost:5000/auth/login", {
                 username: username,
                 password: password,
             });
             localStorage.setItem('username', username);
 
-            // Se c'è una pagina precedente salvata, reindirizza lì. Altrimenti, vai alla home
-            const redirectPath = localStorage.getItem('redirectAfterLogin') || "/"; // Se non c'è, vai alla home
-            localStorage.removeItem('redirectAfterLogin'); // Rimuove il percorso di reindirizzamento
+
+            const redirectPath = localStorage.getItem('redirectAfterLogin') || "/";
+            localStorage.removeItem('redirectAfterLogin');
 
             navigate(redirectPath);
         } catch (error) {
