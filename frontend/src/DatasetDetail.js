@@ -63,19 +63,19 @@ const DatasetDetail = () => {
         setLoading(true);
         try {
             const response = await axios.get(`http://localhost:5000/datasets/getFile/${dataset.storage}`, {
-                params: { page, limit: 20 }, // Limit di 20 per pagina, puoi regolarlo
+                params: { page, limit: 20 },
             });
 
             if (response.data.data.length === 0) {
-                setHasMore(false); // Se non ci sono più dati, non continuare il caricamento
+                setHasMore(false);
             } else {
                 setRows((prevRows) => [...prevRows, ...response.data.data]);
 
                 console.log(response.data.data[0]);
-                // Imposta dinamicamente le colonne usando i nomi della prima riga dei dati
+
                 const dynamicColumns = Object.keys(response.data.data[0]).map(key => ({
                     id: key,
-                    label: response.data.data[0][key] // Formatta il nome della colonna
+                    label: response.data.data[0][key]
                 }));
                 setColumns(dynamicColumns);
 
@@ -127,13 +127,13 @@ const DatasetDetail = () => {
     }
 
 
-    // Dati per l'istogramma
+
     const histogramData = {
-        labels: ['Very Cold', 'Cold', 'Warm', 'Hot'], // Nuove etichette per il grafico
+        labels: ['Very Cold', 'Cold', 'Warm', 'Hot'],
         datasets: [
             {
-                label: 'Numero di utenti',
-                data: [statistiche.veryColdUser, statistiche.coldUser, statistiche.warmUser, statistiche.hotUser],  // Assegna i valori calcolati per ogni categoria
+                label: `Number of user: ${statistiche.numUsers}`,
+                data: [statistiche.veryColdUser, statistiche.coldUser, statistiche.warmUser, statistiche.hotUser],
                 backgroundColor: colors.blueAccent[500],
                 borderColor: colors.blueAccent[800],
                 borderWidth: 1,
@@ -144,13 +144,13 @@ const DatasetDetail = () => {
 
 
 
-    // Dati per l'istogramma
+
     const histogramData2 = {
         labels: ['Very Cold', 'Cold', 'Warm', 'Popular'], // Nuove etichette per il grafico
         datasets: [
             {
-                label: 'Numero items',
-                data: [statistiche.VeryColdItem, statistiche.ColdItem, statistiche.WarmItem, statistiche.PopularItem],  // Assegna i valori calcolati per ogni categoria
+                label: `Number of items: ${statistiche.numItems}`,
+                data: [statistiche.VeryColdItem, statistiche.ColdItem, statistiche.WarmItem, statistiche.PopularItem],
                 backgroundColor: colors.blueAccent[500],
                 borderColor: colors.blueAccent[800],
                 borderWidth: 1,
@@ -160,7 +160,7 @@ const DatasetDetail = () => {
 
     const chartOptions = {
         responsive: true,
-        maintainAspectRatio: false, // Permette di personalizzare le dimensioni
+        maintainAspectRatio: false,
         plugins: {
             legend: {
                 position: 'top',
@@ -261,15 +261,15 @@ const DatasetDetail = () => {
                         </Typography>
                         {dataset?.rating !== undefined ? (
                             <Rating
-                                value={dataset.rating} // Usa il valore del rating che è già stato impostato
-                                readOnly // Disabilita la modifica
-                                precision={0.5} // Imposta la precisione a 0.5 stelle
+                                value={dataset.rating}
+                                readOnly
+                                precision={0.5}
                                 sx={{
                                     '& .MuiRating-iconFilled': {
-                                        color: 'gold', // Colora le stelle piene di giallo
+                                        color: 'gold',
                                     },
                                     '& .MuiRating-iconEmpty': {
-                                        color: colors.grey[500], // Colora le stelle vuote di grigio per visibilità
+                                        color: colors.grey[500],
                                     },
                                 }}
                             />
@@ -283,7 +283,7 @@ const DatasetDetail = () => {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={() => navigate(`/vote/${id}`)} // Aggiungi l'ID del dataset
+                        onClick={() => navigate(`/vote/${id}`)}
                         sx={{ mt: 2 }}
                     >
                         Vota e commenta dataset
@@ -295,9 +295,9 @@ const DatasetDetail = () => {
             {/* Contenitore inferiore (tabella) */}
             <TableContainer component={Paper} sx={{ width: '100%', backgroundColor: colors.primary[400] }}>
                 <InfiniteScroll
-                    dataLength={rows.length} // La lunghezza attuale dei dati
-                    next={fetchData} // Funzione di caricamento dei dati
-                    hasMore={hasMore} // Controlla se ci sono ancora dati da caricare
+                    dataLength={rows.length}
+                    next={fetchData}
+                    hasMore={hasMore}
                     loader={<h4>Caricamento...</h4>}
                     endMessage={<p>Fine dei dati</p>}
                 >

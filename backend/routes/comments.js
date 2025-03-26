@@ -37,7 +37,7 @@ router.post("/", (req, res) => {
         return res.status(400).json({ error: "Tutti i campi obbligatori devono essere compilati" });
     }
 
-    // Inserisce il commento nel database
+
     db.query(
         "INSERT INTO comments (riferimento_id, riferimento_tipo, username, comment, rating) VALUES (?, ?, ?, ?, ?)",
         [riferimento_id, riferimento_tipo, username, comment, rating || null],
@@ -46,12 +46,12 @@ router.post("/", (req, res) => {
                 return res.status(500).json({ error: err.message });
             }
 
-            // Se il rating è null, non serve aggiornare il rating del dataset
+
             if (rating === null || rating === undefined) {
                 return res.status(201).json({ message: "Commento aggiunto con successo", id: result.insertId, comment:comment });
             }else {
 
-                // Calcola la nuova media del rating per il dataset
+
                 db.query(
                     "SELECT AVG(rating) AS media_rating FROM comments WHERE riferimento_id = ? AND rating IS NOT NULL",
                     [riferimento_id],
@@ -62,7 +62,7 @@ router.post("/", (req, res) => {
 
                         const mediaRating = avgResult[0].media_rating || 0.0 ; // Se non ci sono rating, imposta 0
 
-                        // Aggiorna il rating nella tabella dataset
+
                         db.query(
                             "UPDATE datasets SET rating = ? WHERE id = ?",
                             [mediaRating, riferimento_id],
@@ -90,7 +90,7 @@ router.delete("/:id", (req, res) => {
     const { id } = req.params;
     const db = req.db;
 
-    // Prima recuperiamo il riferimento_id e il rating del commento da eliminare
+
     db.query("SELECT riferimento_id, rating FROM comments WHERE id = ?", [id], (err, results) => {
         if (err) {
             return res.status(500).json({ error: err.message });
@@ -101,18 +101,18 @@ router.delete("/:id", (req, res) => {
 
         const { riferimento_id, rating } = results[0];
 
-        // Eliminare il commento
+
         db.query("DELETE FROM comments WHERE id = ?", [id], (err, result) => {
             if (err) {
                 return res.status(500).json({ error: err.message });
             }
 
-            // Se il commento eliminato non aveva rating, non serve aggiornare il dataset
+
             if (rating === null) {
                 return res.json({ message: "Commento eliminato con successo" });
             }
 
-            // Ricalcolare la media dei rating rimasti
+
             db.query(
                 "SELECT AVG(rating) AS media_rating FROM comments WHERE riferimento_id = ? AND rating IS NOT NULL",
                 [riferimento_id],
@@ -123,7 +123,7 @@ router.delete("/:id", (req, res) => {
 
                     const mediaRating = avgResult[0].media_rating || 0; // Se non ci sono rating, imposta 0
 
-                    // Aggiornare la tabella dataset con la nuova media
+
                     db.query(
                         "UPDATE datasets SET rating = ? WHERE id = ?",
                         [mediaRating, riferimento_id],

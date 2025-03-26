@@ -1,9 +1,9 @@
 import { createContext, useState, useMemo } from "react";
 import { createTheme } from "@mui/material/styles";
 
-// color design tokens export, questo mode intende dark o light mode
+
 export const tokens = (mode) => ({
-    ...(mode === "dark" /*Se il mode è dark, passiamo questi colori*/
+    ...(mode === "dark"
         ? {
             grey: {
                 100: "#e0e0e0",
@@ -77,7 +77,7 @@ export const tokens = (mode) => ({
                 100: "#040509",
                 200: "#080b12",
                 300: "#0c101b",
-                400: "#f2f0f0", // manually changed
+                400: "#f2f0f0",
                 500: "#141b2d",
                 600: "#1F2A40",
                 700: "#727681",
@@ -120,15 +120,15 @@ export const tokens = (mode) => ({
         }),
 });
 
-// mui theme settings, sopra abbiamo tutti i colori, qui li settiamo per mui
+
 export const themeSettings = (mode) => {
-    const colors = tokens(mode); /*Ci dà i colori in base al mode*/
+    const colors = tokens(mode);
     return {
         palette: {
             mode: mode,
             ...(mode === "dark"
                 ? {
-                    // palette values for dark mode
+
                     primary: {
                         main: colors.primary[500],
                     },
@@ -145,7 +145,7 @@ export const themeSettings = (mode) => {
                     },
                 }
                 : {
-                    // palette values for light mode
+
                     primary: {
                         main: colors.primary[100],
                     },
@@ -158,7 +158,7 @@ export const themeSettings = (mode) => {
                         light: colors.grey[100],
                     },
                     background: {
-                        default: "#fcfcfc", //manuale
+                        default: "#fcfcfc",
                     },
                 }),
         },
@@ -196,7 +196,7 @@ export const themeSettings = (mode) => {
 // context for color mode
 export const ColorModeContext = createContext({
     toggleColorMode: () => {},
-}); //funzione che ci fa cambiare colore in base al mode
+});
 
 export const useMode = () => {
     const [mode, setMode] = useState("dark");

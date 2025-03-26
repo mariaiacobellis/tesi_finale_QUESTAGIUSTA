@@ -9,7 +9,7 @@ import LoginPage from "./scenes/login/LoginPage";
 import FAQPage from "./scenes/faq/FaqPage";
 import RegisterPage from "./scenes/login/RegisterPage";
 import Datasets from './scenes/datasets/Datasets';
-import DatasetDetail from './DatasetDetail';  // Importata la pagina del singolo dataset
+import DatasetDetail from './DatasetDetail';
 import Discussion from './scenes/discussion/Discussion';
 import Add from './scenes/adddataset/Add';
 import Admin from "./scenes/admin/Admin";
@@ -33,12 +33,12 @@ function App() {
                 <Route path="/faq" element={<FAQPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/datasets" element={<Datasets />} />
-                <Route path="/datasets/:id" element={<DatasetDetail />} />  {/* Pagina dinamica del dataset */}
+                <Route path="/datasets/:id" element={<DatasetDetail />} />
                 <Route path="/discussion" element={<Discussion />} />
                 <Route path="/discussion/:id" element={<Discussion />} />
                 <Route path="/adddatasets" element={<Add />} />
                 <Route path="/admin" element={<Admin />} />
-                <Route path="/vote/:id" element={<DatasetVoteComment />} /> {/* La route per commentare */}
+                <Route path="/vote/:id" element={<DatasetVoteComment />} />
               </Routes>
             </main>
           </div>

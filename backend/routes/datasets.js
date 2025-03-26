@@ -6,7 +6,7 @@ import * as readline from "readline";
 const router = express.Router();
 
 
-// Route per servire il file
+
 router.get('/download/:id', (req, res) => {
     console.log("entro");
     const id = req.params.id;
@@ -14,13 +14,13 @@ router.get('/download/:id', (req, res) => {
     const __dirname = path.dirname(__filename);
     const filePath = path.join(__dirname, 'fileDataset', id);
     console.log(filePath);
-    // Verifica che il file esista
+
     if (fs.existsSync(filePath)) {
         // Stream del file
         const fileStream = fs.createReadStream(filePath);
         res.setHeader('Content-Disposition', 'attachment; filename="file-1741888336628.tsv"');
-        res.setHeader('Content-Type', 'text/tab-separated-values'); // Modifica il tipo MIME se necessario
-        fileStream.pipe(res); // Esegui lo stream del file alla risposta
+        res.setHeader('Content-Type', 'text/tab-separated-values');
+        fileStream.pipe(res);
     } else {
         res.status(404).send('File non trovato');
     }

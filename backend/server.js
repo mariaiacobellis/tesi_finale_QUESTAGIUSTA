@@ -131,47 +131,7 @@ db.connect((err) => {
                 console.log("Tabella 'statistiche dataset' pronta!");
             });
 
-            {/* const createDatasetsTable = `
-                CREATE TABLE IF NOT EXISTS datasets (
-                                                        id INT AUTO_INCREMENT PRIMARY KEY,
-                                                        author TEXT,
-                                                        editor TEXT,
-                                                        title TEXT NOT NULL,
-                                                        booktitle TEXT,
-                                                        pages TEXT,
-                                                        series TEXT,
-                                                        volume TEXT,
-                                                        publisher TEXT,
-                                                        year TEXT,
-                                                        number TEXT,
-                                                        location TEXT,
-                                                        address TEXT,
-                                                        keywords TEXT,
-                                                        url TEXT,
-                                                        doi TEXT,
-                                                        timestamp TEXT,
-                                                        biburl TEXT,
-                                                        bibsource TEXT,
-                                                        journal TEXT,
-                                                        rating FLOAT,
-                                                        storage VARCHAR(255) NOT NULL UNIQUE,
-                    category TEXT NOT NULL,
-                    img TEXT,
-                    numRatings FLOAT ,  -- Numero di valutazioni
-                    numUsers FLOAT,    -- Numero di utenti
-                    numItems FLOAT ,    -- Numero di item
-                    density FLOAT,  -- Densità del dataset
-                    status TEXT,
 
-                    )
-            `;
-            dbWithDB.query(createDatasetsTable, (err, result) => {
-                if (err) {
-                    console.error("Errore nella creazione della tabella dataset:", err);
-                    return;
-                }
-                console.log("Tabella 'dataset' pronta!");
-            }); */}
 
             //Creazione della tabella commenti
             const createCommentsTable = `
@@ -217,7 +177,7 @@ db.connect((err) => {
 
 
 const upload=multer({dest:'uploads/'})
-// Iniettiamo la connessione al db nelle richieste
+
 app.use((req, res, next) => {
     req.db = db;
     next();
